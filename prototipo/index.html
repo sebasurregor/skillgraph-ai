@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="es-CO" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillGraph AI — Prototipo navegable Sprint 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SkillGraph AI · Sistema de diseño
+   Paleta institucional:
+   #002443 navy    #1F5172 azul medio   #67C2EC cielo
+   #0DBA4E verde   #06D261 verde vivo    #FFFFFF blanco
+   ============================================================ */
+:root{
+  --navy:#002443;
+  --navy-2:#1F5172;
+  --sky:#67C2EC;
+  --sky-soft:#E8F5FC;
+  --green:#0DBA4E;
+  --green-vivid:#06D261;
+  --green-soft:#E4F9EC;
+  --white:#FFFFFF;
+
+  --bg:#F3F8FB;
+  --surface:#FFFFFF;
+  --surface-2:#F7FBFD;
+  --line:#D8E7F0;
+  --line-strong:#B9D5E5;
+  --text:#002443;
+  --text-2:#4A6C86;
+  --text-3:#7C99AE;
+  --danger:#D6455B;
+  --danger-soft:#FDEDEF;
+  --warn:#C77B18;
+  --warn-soft:#FDF4E5;
+
+  --r-sm:8px; --r-md:12px; --r-lg:18px; --r-xl:26px;
+  --shadow:0 1px 2px rgba(0,36,67,.05), 0 8px 24px rgba(0,36,67,.06);
+  --shadow-lg:0 18px 50px rgba(0,36,67,.16);
+  --rail:78px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+[data-theme="dark"]{
+  --bg:#00172B;
+  --surface:#012A4A;
+  --surface-2:#04223A;
+  --line:#0F3A5C;
+  --line-strong:#1F5172;
+  --text:#EAF4FA;
+  --text-2:#A8C6DA;
+  --text-3:#7C99AE;
+  --sky-soft:#0A3450;
+  --green-soft:#08361F;
+  --danger-soft:#3A1620;
+  --warn-soft:#3A2A10;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg:0 18px 50px rgba(0,0,0,.5);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  background:var(--bg); color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  transition:background .3s var(--ease), color .3s var(--ease);
+}
+h1,h2,h3,h4,.display{font-family:'Space Grotesk','Inter',system-ui,sans-serif;letter-spacing:-.02em}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--navy-2)}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- utilidades ---------- */
+.hidden{display:none!important}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.muted{color:var(--text-2)}
+.small{font-size:13px}
+.tiny{font-size:11.5px}
+.row{display:flex;gap:12px}
+.row.wrap{flex-wrap:wrap}
+.grow{flex:1}
+.center{align-items:center}
+.between{justify-content:space-between}
+.stack-4>*+*{margin-top:4px}
+.stack-8>*+*{margin-top:8px}
+.stack-16>*+*{margin-top:16px}
+.stack-24>*+*{margin-top:24px}
+
+/* ---------- botones ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:13px 22px;border-radius:var(--r-md);font-size:14.5px;font-weight:600;
+  transition:transform .15s var(--ease), box-shadow .2s var(--ease), background .2s;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:#003864;box-shadow:0 8px 20px rgba(0,36,67,.25)}
+.btn-accent{background:var(--green);color:#fff}
+.btn-accent:hover{background:var(--green-vivid)}
+.btn-ghost{border:1.5px solid var(--line-strong);color:var(--text);background:var(--surface)}
+.btn-ghost:hover{border-color:var(--sky);background:var(--sky-soft)}
+.btn-quiet{color:var(--navy-2);padding:10px 14px}
+.btn-quiet:hover{background:var(--sky-soft)}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-sso{
+  width:100%;background:var(--surface);border:1.5px solid var(--line);
+  color:var(--text);font-weight:500;padding:12px;border-radius:var(--r-md);
+  display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;
+  transition:border-color .2s, background .2s;
+}
+.btn-sso:hover{border-color:var(--sky);background:var(--sky-soft)}
+
+/* ---------- formularios ---------- */
+.field{display:block}
+.field label,.lbl{display:block;font-size:12.5px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+.req{color:var(--danger);font-weight:700}
+.input,.select,.textarea{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--r-md);
+  background:var(--surface);font-size:14.5px;transition:border-color .18s, box-shadow .18s;
+}
+.input::placeholder{color:var(--text-3)}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--sky);box-shadow:0 0 0 4px rgba(103,194,236,.22);outline:none}
+.input.is-invalid,.select.is-invalid,.textarea.is-invalid{border-color:var(--danger);box-shadow:0 0 0 4px rgba(214,69,91,.14)}
+.hint{font-size:11.5px;color:var(--text-3);margin-top:5px}
+.err-msg{font-size:11.5px;color:var(--danger);margin-top:5px;font-weight:600}
+.alert{
+  display:flex;gap:10px;align-items:flex-start;padding:13px 15px;border-radius:var(--r-md);
+  font-size:13.5px;font-weight:600;line-height:1.45;
+}
+.alert-error{background:var(--danger-soft);border:1.5px solid var(--danger);color:var(--danger)}
+.alert-info{background:var(--sky-soft);border:1.5px solid var(--sky);color:var(--navy)}
+.alert-ok{background:var(--green-soft);border:1.5px solid var(--green);color:#0A6B32}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:720px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* ---------- chips ---------- */
+.chip{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;
+  border:1.5px solid var(--line);background:var(--surface);font-size:13.5px;font-weight:500;
+  transition:all .16s var(--ease);
+}
+.chip:hover{border-color:var(--sky);background:var(--sky-soft)}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip-soft{background:var(--sky-soft);border-color:transparent;color:var(--navy-2);font-weight:600}
+
+/* ============================================================
+   AUTENTICACIÓN  (pantalla dividida)
+   ============================================================ */
+.auth{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);min-height:100vh}
+@media(max-width:900px){.auth{grid-template-columns:1fr}.auth-brand{display:none}}
+.auth-brand{
+  background:var(--navy);color:#fff;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:space-between;padding:48px 52px;
+}
+.auth-brand canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+.auth-brand>*{position:relative;z-index:2}
+.brand-mark{display:flex;align-items:center;gap:11px;font-family:'Space Grotesk';font-weight:700;font-size:19px}
+.brand-dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--sky),var(--green-vivid));display:grid;place-items:center}
+.auth-claim{font-size:clamp(30px,3.4vw,44px);font-weight:700;line-height:1.1;max-width:11ch}
+.auth-claim em{font-style:normal;color:var(--sky)}
+.auth-sub{margin-top:18px;max-width:40ch;color:#B9D5E5;font-size:15px;line-height:1.6}
+.auth-facts{display:flex;gap:30px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.16);padding-top:22px}
+.auth-fact b{display:block;font-family:'Space Grotesk';font-size:24px;color:var(--green-vivid)}
+.auth-fact span{font-size:12px;color:#9FC3D8}
+.auth-panel{display:grid;place-items:center;padding:40px 24px;background:var(--surface)}
+.auth-card{width:100%;max-width:430px}
+.auth-card h2{font-size:27px;margin-bottom:6px}
+.divider{display:flex;align-items:center;gap:14px;color:var(--text-3);font-size:12px;margin:20px 0}
+.divider::before,.divider::after{content:"";height:1px;flex:1;background:var(--line)}
+
+/* ============================================================
+   ONBOARDING
+   ============================================================ */
+.ob{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) 380px}
+@media(max-width:1000px){.ob{grid-template-columns:1fr}.ob-aside{display:none}}
+.ob-main{padding:34px clamp(24px,5vw,64px);max-width:820px;width:100%;margin:0 auto}
+.ob-aside{background:var(--navy);color:#fff;padding:34px 30px;position:sticky;top:0;height:100vh;overflow:hidden}
+.steps{display:flex;gap:8px;margin-bottom:34px}
+.step{flex:1}
+.step-bar{height:5px;border-radius:999px;background:var(--line)}
+.step.done .step-bar,.step.active .step-bar{background:var(--green)}
+.step.active .step-bar{background:linear-gradient(90deg,var(--green) 60%,var(--line) 60%)}
+.step-lbl{font-size:11.5px;font-weight:600;margin-top:8px;color:var(--text-3)}
+.step.active .step-lbl,.step.done .step-lbl{color:var(--navy-2)}
+.q-block{padding:24px 0;border-bottom:1px solid var(--line)}
+.q-block:last-of-type{border-bottom:none}
+.q-num{font-family:'Space Grotesk';font-size:12px;font-weight:700;color:var(--sky);letter-spacing:.1em}
+.q-title{font-size:19px;font-weight:600;margin:4px 0 4px}
+.q-help{font-size:13px;color:var(--text-2);margin-bottom:14px}
+.opt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.opt{
+  padding:14px 16px;border:1.5px solid var(--line);border-radius:var(--r-md);
+  background:var(--surface);text-align:left;font-size:14px;font-weight:500;
+  transition:all .16s var(--ease);display:flex;align-items:center;gap:10px;
+}
+.opt:hover{border-color:var(--sky);background:var(--sky-soft)}
+.opt[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);color:#0A6B32;font-weight:600}
+.opt .tick{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line-strong);flex:none;display:grid;place-items:center}
+.opt[aria-pressed="true"] .tick{background:var(--green);border-color:var(--green)}
+.skill-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.skill-row:last-child{border-bottom:none}
+.skill-row .nm{width:150px;font-size:14px;font-weight:600}
+.lvl{display:flex;gap:5px}
+.lvl button{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--line);font-size:12.5px;font-weight:600;color:var(--text-2)}
+.lvl button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* grafo lateral */
+.graph-live{position:relative;height:340px;margin-top:26px}
+.graph-live svg{width:100%;height:100%;overflow:visible}
+.gnode-label{font-size:9.5px;font-family:'Inter';fill:#CFE6F3}
+.ob-aside h3{font-size:17px}
+.ob-aside p{color:#9FC3D8;font-size:13px;line-height:1.6;margin-top:8px}
+.counter{font-family:'Space Grotesk';font-size:40px;color:var(--green-vivid);font-weight:700}
+
+/* dropzone */
+.drop{
+  border:2px dashed var(--line-strong);border-radius:var(--r-lg);padding:28px 20px;text-align:center;
+  background:var(--surface-2);transition:all .18s var(--ease);cursor:pointer;
+}
+.drop:hover,.drop.over{border-color:var(--green);background:var(--green-soft)}
+.drop.filled{border-style:solid;border-color:var(--green);background:var(--green-soft);text-align:left}
+.file-pill{display:flex;align-items:center;gap:12px}
+.file-ico{width:38px;height:38px;border-radius:10px;background:var(--green);display:grid;place-items:center;flex:none}
+
+/* ============================================================
+   APLICACIÓN (rail + contenido)
+   ============================================================ */
+.app{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);min-height:100vh}
+.rail{
+  background:var(--navy);display:flex;flex-direction:column;align-items:center;
+  padding:18px 0;gap:10px;position:sticky;top:0;height:100vh;
+}
+.rail-logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--green-vivid));display:grid;place-items:center;margin-bottom:14px}
+.rail-btn{
+  width:50px;height:50px;border-radius:15px;display:grid;place-items:center;color:#8FB4CC;
+  position:relative;transition:all .18s var(--ease);
+}
+.rail-btn:hover{background:rgba(103,194,236,.16);color:#fff}
+.rail-btn.active{background:var(--sky);color:var(--navy)}
+.rail-btn .badge{
+  position:absolute;top:5px;right:5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;
+  background:var(--green-vivid);color:var(--navy);font-size:10.5px;font-weight:700;display:grid;place-items:center;
+}
+.rail-tip{
+  position:absolute;left:64px;background:var(--navy);color:#fff;padding:7px 12px;border-radius:8px;
+  font-size:12.5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;
+  box-shadow:var(--shadow-lg);z-index:60;
+}
+.rail-btn:hover .rail-tip{opacity:1}
+.rail-spacer{flex:1}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--sky);color:var(--navy);display:grid;place-items:center;font-weight:700;font-size:15px}
+
+.view{padding:30px clamp(20px,3.5vw,44px) 60px;max-width:1180px}
+.view-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.view-head h1{font-size:27px}
+.view-head p{color:var(--text-2);font-size:14px;margin-top:4px}
+
+/* búsqueda */
+.searchbar{
+  display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--line);
+  border-radius:var(--r-xl);padding:8px 8px 8px 20px;box-shadow:var(--shadow);
+  transition:border-color .18s, box-shadow .18s;
+}
+.searchbar:focus-within{border-color:var(--sky);box-shadow:0 0 0 5px rgba(103,194,236,.2)}
+.searchbar input{flex:1;border:none;background:none;font-size:16px;padding:12px 0}
+.searchbar input:focus{outline:none}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.recents{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+
+/* tarjetas de vacante */
+.job{
+  background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:20px 22px;
+  transition:border-color .18s var(--ease), transform .18s var(--ease), box-shadow .2s var(--ease);
+}
+.job:hover{border-color:var(--sky);transform:translateY(-2px);box-shadow:var(--shadow)}
+.job-top{display:flex;gap:16px;align-items:flex-start}
+.logo-sq{width:46px;height:46px;border-radius:12px;background:var(--sky-soft);color:var(--navy-2);display:grid;place-items:center;font-family:'Space Grotesk';font-weight:700;font-size:17px;flex:none}
+.job h3{font-size:17px}
+.meta{font-size:12.5px;color:var(--text-2);margin-top:3px}
+.score{text-align:center;flex:none;width:74px}
+.ring{position:relative;width:66px;height:66px}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:'Space Grotesk';font-size:16px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.tag{font-size:11.5px;padding:5px 10px;border-radius:999px;font-weight:600}
+.tag-ok{background:var(--green-soft);color:#0A6B32}
+.tag-miss{background:var(--danger-soft);color:var(--danger)}
+.job-actions{display:flex;gap:8px;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.heart{width:40px;height:40px;border-radius:12px;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--text-3);transition:all .16s}
+.heart:hover{border-color:var(--danger);color:var(--danger)}
+.heart.on{background:var(--danger-soft);border-color:var(--danger);color:var(--danger)}
+
+/* explicabilidad */
+.explain{background:var(--surface-2);border-top:1px dashed var(--line-strong);margin-top:16px;padding-top:18px}
+.comp{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.comp .cn{width:230px;font-size:13px}
+.bar{flex:1;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:var(--green);transition:width .5s var(--ease)}
+.bar i.blue{background:var(--sky)}
+.bar i.navy{background:var(--navy-2)}
+.comp .cv{width:96px;text-align:right;font-size:11.5px;color:var(--text-3)}
+.explain-box{background:var(--sky-soft);border:1.5px solid var(--sky);border-radius:var(--r-md);padding:15px 17px;margin-top:14px;font-size:13.5px;line-height:1.6}
+.mini-graph{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-md);padding:10px;margin-top:14px}
+
+/* ajustes */
+.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--line);margin-bottom:24px;flex-wrap:wrap}
+.tab{padding:11px 16px;font-size:14px;font-weight:600;color:var(--text-2);border-bottom:2.5px solid transparent;margin-bottom:-1.5px}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);border-bottom-color:var(--green)}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:22px}
+.card h3{font-size:16px;margin-bottom:4px}
+.setting{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:15px 0;border-bottom:1px solid var(--line)}
+.setting:last-child{border-bottom:none}
+.switch{width:50px;height:28px;border-radius:999px;background:var(--line-strong);position:relative;transition:background .2s;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .22s var(--ease);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch[aria-checked="true"]{background:var(--green)}
+.switch[aria-checked="true"]::after{transform:translateX(22px)}
+
+/* estado vacío */
+.empty{text-align:center;padding:70px 20px;border:2px dashed var(--line);border-radius:var(--r-xl);background:var(--surface)}
+.empty svg{color:var(--line-strong)}
+.empty h3{margin:16px 0 6px;font-size:19px}
+.empty p{color:var(--text-2);font-size:14px;max-width:44ch;margin:0 auto 20px}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:32px;transform:translate(-50%,90px);z-index:200;
+  background:var(--navy);color:#fff;padding:14px 22px;border-radius:var(--r-md);
+  font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);transition:transform .3s var(--ease);
+  display:flex;align-items:center;gap:10px;max-width:90vw;
+}
+#toast.show{transform:translate(-50%,0)}
+
+/* aparición */
+.pop{animation:pop .34s var(--ease) both}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.rise{animation:rise .3s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- ===================== 1. CORREO ===================== -->
+<section id="s-email" class="auth">
+  <aside class="auth-brand">
+    <canvas id="netcanvas"></canvas>
+    <div class="brand-mark">
+      <span class="brand-dot">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#002443" stroke-width="2.4" stroke-linecap="round">
+          <circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/>
+          <path d="M12 7.4 6.6 15.8M12 7.4l5.4 8.4M7.4 18h9.2"/>
+        </svg>
+      </span>
+      SkillGraph AI
+    </div>
+    <div>
+      <h1 class="auth-claim">Sepa <em>por qué</em> encaja.</h1>
+      <p class="auth-sub">No le damos un porcentaje y ya. Le mostramos qué habilidades cubre,
+        cuáles le faltan, cuánto pesa cada una y qué necesita aprender para subir el ajuste.</p>
+    </div>
+    <div class="auth-facts">
+      <div class="auth-fact"><b>312</b><span>habilidades en el grafo</span></div>
+      <div class="auth-fact"><b>84</b><span>vacantes activas</span></div>
+      <div class="auth-fact"><b>0,4 s</b><span>por recomendación</span></div>
+    </div>
+  </aside>
+
+  <div class="auth-panel">
+    <div class="auth-card">
+      <p class="eyebrow">Paso 1 de 2</p>
+      <h2>Empecemos por su correo</h2>
+      <p class="muted small">Si ya tiene cuenta, le pedimos la contraseña. Si no, creamos una en 30 segundos.</p>
+
+      <div id="email-alert" class="hidden" style="margin-top:18px"></div>
+
+      <form id="form-email" class="stack-16" style="margin-top:18px" novalidate>
+        <div class="field">
+          <label for="i-email">Correo electrónico <span class="req">*</span></label>
+          <input class="input" type="email" id="i-email" name="email" placeholder="nombre@correo.com" autocomplete="email">
+          <p class="hint">Cuenta de prueba cargada: <b>ana.rios@correo.com</b> · contraseña <b>skillgraph2026</b></p>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Continuar</button>
+      </form>
+
+      <div class="divider">o continúe con</div>
+      <div class="stack-8">
+        <button class="btn-sso" data-sso="Google">
+          <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.4-4.7 7l7.6 5.9c4.4-4.1 6.8-10.1 6.8-17.4z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.8-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.7-3.7-13.6-9.9l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+          Continuar con Google
+        </button>
+        <button class="btn-sso" data-sso="Apple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.53c-.02-2.4 1.96-3.55 2.05-3.61-1.12-1.63-2.86-1.86-3.48-1.89-1.48-.15-2.89.87-3.64.87-.75 0-1.91-.85-3.14-.83-1.61.02-3.1.94-3.93 2.38-1.68 2.91-.43 7.22 1.2 9.58.8 1.16 1.75 2.46 3 2.41 1.21-.05 1.66-.78 3.12-.78 1.46 0 1.87.78 3.14.75 1.3-.02 2.12-1.18 2.91-2.34.92-1.34 1.3-2.64 1.32-2.71-.03-.01-2.53-.97-2.55-3.83zM14.7 4.9c.66-.81 1.11-1.93.99-3.05-.95.04-2.11.64-2.8 1.44-.62.71-1.16 1.85-1.02 2.94 1.06.08 2.15-.54 2.83-1.33z"/></svg>
+          Continuar con Apple
+        </button>
+        <button class="btn-sso" data-sso="Microsoft">
+          <svg width="16" height="16" viewBox="0 0 23 23"><path fill="#F25022" d="M1 1h10v10H1z"/><path fill="#7FBA00" d="M12 1h10v10H12z"/><path fill="#00A4EF" d="M1 12h10v10H1z"/><path fill="#FFB900" d="M12 12h10v10H12z"/></svg>
+          Continuar con Microsoft
+        </button>
+      </div>
+
+      <p class="tiny muted" style="margin-top:22px;text-align:center;line-height:1.6">
+        Al continuar acepta la política de tratamiento de datos personales<br>conforme a la Ley 1581 de 2012.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2. CONTRASEÑA ===================== -->
+<section id="s-password" class="auth hidden">
+  <aside class="auth-brand">
+    <div class="brand-mark"><span class="brand-dot">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#002443" stroke-width="2.4" stroke-linecap="round">
+        <circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/>
+        <path d="M12 7.4 6.6 15.8M12 7.4l5.4 8.4M7.4 18h9.2"/></svg></span>SkillGraph AI</div>
+    <div>
+      <h1 class="auth-claim">Bienvenida de vuelta.</h1>
+      <p class="auth-sub">Su grafo de habilidades sigue donde lo dejó. Publicamos 12 vacantes nuevas
+        desde su última visita.</p>
+    </div>
+    <div class="auth-facts">
+      <div class="auth-fact"><b>12</b><span>vacantes nuevas para su perfil</span></div>
+    </div>
+  </aside>
+  <div class="auth-panel">
+    <div class="auth-card">
+      <button class="btn-quiet" data-go="s-email" style="margin-bottom:14px">← Usar otro correo</button>
+      <h2>Ingrese su contraseña</h2>
+      <p class="muted small" id="pw-email-echo"></p>
+      <div id="pw-alert" class="hidden" style="margin-top:18px"></div>
+      <form id="form-pw" class="stack-16" style="margin-top:18px" novalidate>
+        <div class="field">
+          <label for="i-pw">Contraseña <span class="req">*</span></label>
+          <input class="input" type="password" id="i-pw" name="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
+        <button type="button" class="btn btn-quiet btn-block">¿Olvidó su contraseña?</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 3. REGISTRO ===================== -->
+<section id="s-signup" class="auth hidden">
+  <aside class="auth-brand">
+    <div class="brand-mark"><span class="brand-dot">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#002443" stroke-width="2.4" stroke-linecap="round">
+        <circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/>
+        <path d="M12 7.4 6.6 15.8M12 7.4l5.4 8.4M7.4 18h9.2"/></svg></span>SkillGraph AI</div>
+    <div>
+      <h1 class="auth-claim">Su perfil es un <em>grafo</em>, no un PDF.</h1>
+      <p class="auth-sub">Cada habilidad que declara se convierte en un nodo conectado a roles y vacantes reales.
+        Por eso podemos explicarle el resultado.</p>
+    </div>
+    <div class="auth-facts">
+      <div class="auth-fact"><b>3 min</b><span>para su primera recomendación</span></div>
+    </div>
+  </aside>
+  <div class="auth-panel">
+    <div class="auth-card">
+      <button class="btn-quiet" data-go="s-email" style="margin-bottom:14px">← Volver</button>
+      <p class="eyebrow">Paso 2 de 2</p>
+      <h2>Cree su cuenta</h2>
+      <p class="muted small">No encontramos una cuenta con ese correo. Complete estos datos para continuar.</p>
+      <div id="su-alert" class="hidden" style="margin-top:18px"></div>
+
+      <form id="form-signup" style="margin-top:18px" novalidate>
+        <div class="grid-2">
+          <div class="field"><label for="i-nom">Nombres <span class="req">*</span></label>
+            <input class="input" id="i-nom" name="nombres" placeholder="Ana María"></div>
+          <div class="field"><label for="i-ape">Apellidos <span class="req">*</span></label>
+            <input class="input" id="i-ape" name="apellidos" placeholder="Ríos Bedoya"></div>
+        </div>
+        <div class="field" style="margin-top:14px"><label for="i-mail2">Correo electrónico <span class="req">*</span></label>
+          <input class="input" type="email" id="i-mail2" name="correo"></div>
+        <div class="grid-2" style="margin-top:14px">
+          <div class="field"><label for="i-tel">Teléfono <span class="req">*</span></label>
+            <input class="input" id="i-tel" name="telefono" placeholder="3001234567" inputmode="numeric"></div>
+          <div class="field"><label for="i-ciudad">Ciudad <span class="req">*</span></label>
+            <select class="select" id="i-ciudad" name="ciudad">
+              <option value="">Seleccione…</option>
+              <option>Medellín</option><option>Bogotá</option><option>Cali</option>
+              <option>Barranquilla</option><option>Bucaramanga</option><option>Pereira</option><option>Otra</option>
+            </select></div>
+        </div>
+        <div class="grid-2" style="margin-top:14px">
+          <div class="field"><label for="i-pw1">Contraseña <span class="req">*</span></label>
+            <input class="input" type="password" id="i-pw1" name="pw1" placeholder="Mínimo 8 caracteres"></div>
+          <div class="field"><label for="i-pw2">Confirmar contraseña <span class="req">*</span></label>
+            <input class="input" type="password" id="i-pw2" name="pw2"></div>
+        </div>
+        <label class="row center" style="margin-top:18px;gap:10px;cursor:pointer">
+          <input type="checkbox" id="i-hab" style="width:18px;height:18px;accent-color:#0DBA4E;flex:none">
+          <span class="tiny muted">Autorizo el tratamiento de mis datos personales para fines de intermediación laboral,
+            conforme a la Ley 1581 de 2012. <span class="req">*</span></span>
+        </label>
+        <button class="btn btn-primary btn-block" type="submit" style="margin-top:20px">Crear cuenta</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. CUESTIONARIO ===================== -->
+<section id="s-quiz" class="ob hidden">
+  <div class="ob-main">
+    <div class="steps">
+      <div class="step active"><div class="step-bar"></div><div class="step-lbl">1 · Qué busca</div></div>
+      <div class="step"><div class="step-bar"></div><div class="step-lbl">2 · Su información</div></div>
+      <div class="step"><div class="step-bar"></div><div class="step-lbl">3 · Recomendaciones</div></div>
+    </div>
+
+    <p class="eyebrow">Cuestionario inicial</p>
+    <h1 style="font-size:30px;margin:6px 0 8px">Cuéntenos qué está buscando</h1>
+    <p class="muted" style="max-width:56ch">Cada respuesta agrega un nodo a su grafo y cambia lo que le vamos a recomendar.
+      Son ocho preguntas y toma menos de dos minutos.</p>
+
+    <div id="quiz-alert" class="hidden" style="margin-top:20px"></div>
+    <div id="quiz-body" style="margin-top:10px"></div>
+
+    <div class="row between center" style="margin-top:30px;padding-top:22px;border-top:1px solid var(--line)">
+      <span class="small muted" id="quiz-count">0 de 8 preguntas respondidas</span>
+      <button class="btn btn-primary" id="quiz-next">Continuar a mis datos →</button>
+    </div>
+  </div>
+
+  <aside class="ob-aside">
+    <p class="eyebrow" style="color:#67C2EC">Su grafo en construcción</p>
+    <h3>Esto es lo que el motor entiende de usted</h3>
+    <p>Los nodos aparecen a medida que responde. Al final, este subgrafo se compara contra el de cada vacante.</p>
+    <div class="graph-live"><svg id="live-graph" viewBox="0 0 320 340"></svg></div>
+    <div class="row center" style="gap:14px;margin-top:6px">
+      <span class="counter" id="node-count">1</span>
+      <span class="tiny" style="color:#9FC3D8">nodos<br>en su grafo</span>
+    </div>
+  </aside>
+</section>
+
+<!-- ===================== 5. PERFIL Y DOCUMENTOS ===================== -->
+<section id="s-profile" class="ob hidden">
+  <div class="ob-main">
+    <div class="steps">
+      <div class="step done"><div class="step-bar"></div><div class="step-lbl">1 · Qué busca</div></div>
+      <div class="step active"><div class="step-bar"></div><div class="step-lbl">2 · Su información</div></div>
+      <div class="step"><div class="step-bar"></div><div class="step-lbl">3 · Recomendaciones</div></div>
+    </div>
+
+    <p class="eyebrow">Hoja de vida y datos</p>
+    <h1 style="font-size:30px;margin:6px 0 8px">Lo que el contratante necesita ver</h1>
+    <p class="muted" style="max-width:58ch">Los datos marcados con <span class="req">*</span> son obligatorios para postularse.
+      Sus documentos de identidad solo se comparten cuando usted acepta una postulación.</p>
+
+    <div id="prof-alert" class="hidden" style="margin-top:20px"></div>
+
+    <form id="form-profile" style="margin-top:24px">
+      <div class="card">
+        <h3>Identificación</h3>
+        <p class="small muted">Debe coincidir con su documento.</p>
+        <div class="grid-2" style="margin-top:16px">
+          <div class="field"><label for="p-nombre">Nombre completo <span class="req">*</span></label>
+            <input class="input" id="p-nombre" name="nombre"></div>
+          <div class="field"><label for="p-nac">Fecha de nacimiento <span class="req">*</span></label>
+            <input class="input" type="date" id="p-nac" name="nacimiento"></div>
+        </div>
+        <div class="grid-3" style="margin-top:14px">
+          <div class="field"><label for="p-tipodoc">Tipo de documento <span class="req">*</span></label>
+            <select class="select" id="p-tipodoc" name="tipodoc">
+              <option value="">Seleccione…</option>
+              <option>Cédula de ciudadanía</option><option>Cédula de extranjería</option>
+              <option>Tarjeta de identidad</option><option>Pasaporte</option><option>PPT</option>
+            </select></div>
+          <div class="field"><label for="p-doc">Número de documento <span class="req">*</span></label>
+            <input class="input" id="p-doc" name="documento" inputmode="numeric" placeholder="1010101010"></div>
+          <div class="field"><label for="p-exp">Lugar de expedición</label>
+            <input class="input" id="p-exp" name="expedicion" placeholder="Medellín"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Contacto y residencia</h3>
+        <div class="grid-2" style="margin-top:16px">
+          <div class="field"><label for="p-tel">Teléfono móvil <span class="req">*</span></label>
+            <input class="input" id="p-tel" name="telefono" inputmode="numeric"></div>
+          <div class="field"><label for="p-mail">Correo electrónico <span class="req">*</span></label>
+            <input class="input" type="email" id="p-mail" name="correo"></div>
+        </div>
+        <div class="grid-2" style="margin-top:14px">
+          <div class="field"><label for="p-dir">Dirección de residencia <span class="req">*</span></label>
+            <input class="input" id="p-dir" name="direccion" placeholder="Cra 43A # 5-15, apto 302"></div>
+          <div class="field"><label for="p-ciudad">Ciudad de residencia <span class="req">*</span></label>
+            <input class="input" id="p-ciudad" name="ciudadres" placeholder="Medellín, Antioquia"></div>
+        </div>
+        <div class="grid-2" style="margin-top:14px">
+          <div class="field"><label for="p-eps">EPS / afiliación en salud</label>
+            <input class="input" id="p-eps" name="eps" placeholder="Sura"></div>
+          <div class="field"><label for="p-emerg">Contacto de emergencia</label>
+            <input class="input" id="p-emerg" name="emergencia" placeholder="Nombre y teléfono"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Trayectoria</h3>
+        <div class="grid-3" style="margin-top:16px">
+          <div class="field"><label for="p-edu">Nivel educativo <span class="req">*</span></label>
+            <select class="select" id="p-edu" name="educacion">
+              <option value="">Seleccione…</option>
+              <option>Bachiller</option><option>Técnico</option><option>Tecnólogo</option>
+              <option>Profesional</option><option>Especialización</option><option>Maestría</option><option>Doctorado</option>
+            </select></div>
+          <div class="field"><label for="p-titulo">Título obtenido</label>
+            <input class="input" id="p-titulo" name="titulo" placeholder="Ingeniería de Sistemas"></div>
+          <div class="field"><label for="p-anios">Años de experiencia <span class="req">*</span></label>
+            <input class="input" id="p-anios" name="anios" type="number" min="0" max="50" placeholder="4"></div>
+        </div>
+        <div class="grid-3" style="margin-top:14px">
+          <div class="field"><label for="p-linkedin">LinkedIn</label>
+            <input class="input" id="p-linkedin" placeholder="linkedin.com/in/…"></div>
+          <div class="field"><label for="p-github">GitHub o portafolio</label>
+            <input class="input" id="p-github" placeholder="github.com/…"></div>
+          <div class="field"><label for="p-idiomas">Idiomas</label>
+            <input class="input" id="p-idiomas" placeholder="Español nativo, inglés B2"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Documentos</h3>
+        <p class="small muted">Formatos aceptados: PDF, JPG o PNG. Máximo 10 MB por archivo.</p>
+        <div class="grid-2" style="margin-top:16px">
+          <div>
+            <p class="lbl">Hoja de vida <span class="req">*</span></p>
+            <div class="drop" data-drop="cv"><input type="file" class="hidden" accept=".pdf,.doc,.docx">
+              <div class="dz">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--navy-2)">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <p style="font-weight:600;font-size:14px;margin-top:8px">Arrastre su hoja de vida o haga clic</p>
+                <p class="tiny muted">Extraemos automáticamente sus habilidades</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="lbl">Documento de identidad <span class="req">*</span></p>
+            <div class="drop" data-drop="doc"><input type="file" class="hidden" accept=".pdf,.jpg,.png">
+              <div class="dz">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--navy-2)">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="8.5" cy="11" r="2.2"/><path d="M14 10h5M14 14h5M4.5 17c1-2 5-2 6 0"/></svg>
+                <p style="font-weight:600;font-size:14px;margin-top:8px">Cédula por ambas caras</p>
+                <p class="tiny muted">Solo se comparte al aceptar una postulación</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:14px">
+          <div>
+            <p class="lbl">Certificados laborales</p>
+            <div class="drop" data-drop="cert"><input type="file" class="hidden">
+              <div class="dz"><p style="font-weight:600;font-size:13.5px">Opcional · suma evidencia a sus habilidades</p></div>
+            </div>
+          </div>
+          <div>
+            <p class="lbl">Certificados de estudio</p>
+            <div class="drop" data-drop="est"><input type="file" class="hidden">
+              <div class="dz"><p style="font-weight:600;font-size:13.5px">Opcional · diplomas, cursos, certificaciones</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row between center" style="margin-top:26px;padding-top:22px;border-top:1px solid var(--line);flex-wrap:wrap;gap:14px">
+        <button type="button" class="btn btn-ghost" data-go="s-quiz">← Volver al cuestionario</button>
+        <button class="btn btn-accent" type="submit">Guardar y ver mis recomendaciones →</button>
+      </div>
+    </form>
+  </div>
+
+  <aside class="ob-aside">
+    <p class="eyebrow" style="color:#67C2EC">Por qué le pedimos esto</p>
+    <h3>Cada campo tiene un uso concreto</h3>
+    <div class="stack-16" style="margin-top:20px">
+      <div><p style="color:#fff;font-weight:600;font-size:13.5px">Documento y residencia</p>
+        <p style="margin-top:2px">El contratante los necesita para la vinculación y para filtrar por ciudad o modalidad.</p></div>
+      <div><p style="color:#fff;font-weight:600;font-size:13.5px">Hoja de vida</p>
+        <p style="margin-top:2px">De aquí extraemos habilidades que usted no declaró y las agregamos como nodos sugeridos.</p></div>
+      <div><p style="color:#fff;font-weight:600;font-size:13.5px">Certificados</p>
+        <p style="margin-top:2px">Convierten una habilidad declarada en una habilidad verificada. Pesan más en el cálculo.</p></div>
+      <div><p style="color:#fff;font-weight:600;font-size:13.5px">Años de experiencia</p>
+        <p style="margin-top:2px">Ajustan el componente de nivel frente al mínimo que exige cada vacante.</p></div>
+    </div>
+    <div style="margin-top:26px;padding:16px;border:1px solid rgba(255,255,255,.16);border-radius:14px">
+      <p style="color:#06D261;font-weight:700;font-size:12.5px">Ley 1581 de 2012</p>
+      <p style="margin-top:6px">Puede descargar o eliminar todos sus datos en cualquier momento desde Ajustes → Privacidad.</p>
+    </div>
+  </aside>
+</section>
+
+<!-- ===================== 6. APLICACIÓN ===================== -->
+<section id="s-app" class="app hidden">
+  <nav class="rail" aria-label="Navegación principal">
+    <div class="rail-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#002443" stroke-width="2.4" stroke-linecap="round">
+        <circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/>
+        <path d="M12 7.4 6.6 15.8M12 7.4l5.4 8.4M7.4 18h9.2"/></svg>
+    </div>
+
+    <button class="rail-btn active" data-tab="search" aria-label="Buscar empleo">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <span class="rail-tip">Buscar empleo</span>
+    </button>
+
+    <button class="rail-btn" data-tab="saved" aria-label="Guardados">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+        <path d="M12 20.5s-7.5-4.7-7.5-9.7a4.3 4.3 0 0 1 7.5-2.8 4.3 4.3 0 0 1 7.5 2.8c0 5-7.5 9.7-7.5 9.7z"/></svg>
+      <span class="badge hidden" id="saved-badge">0</span>
+      <span class="rail-tip">Guardados</span>
+    </button>
+
+    <button class="rail-btn" data-tab="settings" aria-label="Ajustes">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3.2"/>
+        <path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+      <span class="rail-tip">Ajustes</span>
+    </button>
+
+    <div class="rail-spacer"></div>
+    <div class="avatar" id="rail-avatar" title="Su cuenta">AR</div>
+  </nav>
+
+  <main>
+    <!-- ---------- BUSCAR ---------- -->
+    <div class="view" id="tab-search">
+      <div class="view-head">
+        <div>
+          <p class="eyebrow">Buscar empleo</p>
+          <h1 id="greet">Hola, Ana</h1>
+          <p>Estas vacantes se ordenan por qué tanto encaja su grafo de habilidades, no por fecha de publicación.</p>
+        </div>
+        <button class="btn btn-ghost" id="btn-edit-skills">Ajustar mis habilidades</button>
+      </div>
+
+      <div class="searchbar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <input id="q" type="search" placeholder="Cargo, empresa o habilidad — por ejemplo: backend Django">
+        <button class="btn btn-primary" id="btn-search">Buscar</button>
+      </div>
+
+      <div class="filters" id="filters"></div>
+
+      <div class="recents">
+        <div class="row between center">
+          <p class="eyebrow">Últimas búsquedas</p>
+          <button class="btn-quiet tiny" id="clear-recents">Borrar historial</button>
+        </div>
+        <div class="row wrap" id="recents-list" style="margin-top:10px"></div>
+      </div>
+
+      <div class="row between center" style="margin-top:32px">
+        <h2 style="font-size:19px" id="results-title">Recomendadas para usted</h2>
+        <select class="select" id="sort" style="width:auto">
+          <option value="match">Mayor ajuste</option>
+          <option value="salary">Mayor salario</option>
+          <option value="recent">Más recientes</option>
+        </select>
+      </div>
+      <div class="stack-16" id="jobs" style="margin-top:16px"></div>
+    </div>
+
+    <!-- ---------- GUARDADOS ---------- -->
+    <div class="view hidden" id="tab-saved">
+      <div class="view-head">
+        <div>
+          <p class="eyebrow">Guardados</p>
+          <h1>Vacantes que le gustaron</h1>
+          <p>Aquí quedan las postulaciones marcadas con el corazón. Le avisamos si cambian de estado.</p>
+        </div>
+      </div>
+      <div id="saved-list" class="stack-16"></div>
+    </div>
+
+    <!-- ---------- AJUSTES ---------- -->
+    <div class="view hidden" id="tab-settings">
+      <div class="view-head">
+        <div>
+          <p class="eyebrow">Ajustes</p>
+          <h1>Perfil y aplicación</h1>
+          <p>Modifique su información, reemplace su hoja de vida o cambie cómo se ve y se comporta la aplicación.</p>
+        </div>
+      </div>
+      <div class="tabs" id="settings-tabs">
+        <button class="tab active" data-st="perfil">Perfil</button>
+        <button class="tab" data-st="hv">Hoja de vida y habilidades</button>
+        <button class="tab" data-st="app">Aplicación</button>
+        <button class="tab" data-st="priv">Privacidad</button>
+        <button class="tab" data-st="cuenta">Cuenta</button>
+      </div>
+      <div id="settings-body"></div>
+    </div>
+  </main>
+</section>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+   SkillGraph AI — prototipo Sprint 1
+   Estado en memoria (sin base de datos): al recargar, vuelve al inicio.
+   ===================================================================== */
+const MSG_OBLIG = "Favor ingresar información válida en los campos obligatorios.";
+
+const CUENTAS = { "ana.rios@correo.com": { pw: "skillgraph2026", nombres: "Ana María", apellidos: "Ríos Bedoya" } };
+
+const state = {
+  email: "", user: null, respuestas: {}, skills: {},
+  perfil: {}, docs: {}, guardadas: new Set(),
+  recientes: ["backend django", "neo4j medellín", "remoto senior"],
+  tema: "light", tab: "search", stab: "perfil", filtro: "todas", orden: "match", query: ""
+};
+
+/* ---------------- catálogo de habilidades y vacantes ---------------- */
+const CATALOGO = ["Python","Django","JavaScript","TypeScript","React","Node.js","Java","Spring Boot",
+  "SQL","PostgreSQL","Neo4j / Cypher","Docker","Kubernetes","AWS","Git","Linux","Pandas",
+  "Power BI","Figma","Scrum","Pruebas automatizadas","Ciberseguridad"];
+
+const VACANTES = [
+  { id:128, titulo:"Desarrollador Backend Senior", empresa:"TechNova S.A.S.", sigla:"TN", ciudad:"Medellín",
+    modalidad:"Híbrido", salario:9500000, dias:3, rol:"Backend Engineer", centralidad:0.91,
+    req:[["Python",.30,4],["Django",.25,4],["Neo4j / Cypher",.25,3],["Docker",.12,2],["Scrum",.08,2]] },
+  { id:131, titulo:"Ingeniera de Datos", empresa:"Andes Analytics", sigla:"AA", ciudad:"Bogotá",
+    modalidad:"Remoto", salario:8800000, dias:1, rol:"Data Engineer", centralidad:0.84,
+    req:[["Python",.28,4],["SQL",.24,4],["Pandas",.20,3],["AWS",.16,3],["Docker",.12,2]] },
+  { id:142, titulo:"Desarrollador Full Stack", empresa:"Kúmara Digital", sigla:"KD", ciudad:"Medellín",
+    modalidad:"Presencial", salario:7200000, dias:6, rol:"Full Stack Engineer", centralidad:0.88,
+    req:[["JavaScript",.25,4],["React",.25,4],["Node.js",.20,3],["SQL",.18,3],["Git",.12,3]] },
+  { id:155, titulo:"Analista de Pruebas Automatizadas", empresa:"Quantum QA", sigla:"QQ", ciudad:"Cali",
+    modalidad:"Remoto", salario:6100000, dias:9, rol:"QA Engineer", centralidad:0.72,
+    req:[["Pruebas automatizadas",.35,4],["Python",.25,3],["Git",.20,3],["SQL",.20,2]] },
+  { id:161, titulo:"Ingeniero DevOps", empresa:"Nubex Cloud", sigla:"NC", ciudad:"Remoto",
+    modalidad:"Remoto", salario:11200000, dias:2, rol:"DevOps Engineer", centralidad:0.79,
+    req:[["Docker",.28,4],["Kubernetes",.26,4],["AWS",.24,4],["Linux",.14,3],["Git",.08,3]] },
+  { id:167, titulo:"Desarrollador Backend Junior", empresa:"Semilla Tech", sigla:"ST", ciudad:"Medellín",
+    modalidad:"Híbrido", salario:3900000, dias:4, rol:"Backend Engineer", centralidad:0.91,
+    req:[["Python",.35,2],["SQL",.25,2],["Git",.22,2],["Django",.18,2]] },
+  { id:172, titulo:"Diseñadora de Producto", empresa:"Vera Studio", sigla:"VS", ciudad:"Bogotá",
+    modalidad:"Híbrido", salario:6800000, dias:11, rol:"Product Designer", centralidad:0.61,
+    req:[["Figma",.45,4],["Scrum",.20,3],["JavaScript",.20,2],["Git",.15,2]] },
+  { id:180, titulo:"Analista de Ciberseguridad", empresa:"Fortia Seguridad", sigla:"FS", ciudad:"Bogotá",
+    modalidad:"Presencial", salario:8100000, dias:7, rol:"Security Analyst", centralidad:0.68,
+    req:[["Ciberseguridad",.40,4],["Linux",.25,3],["Python",.20,3],["AWS",.15,2]] }
+];
+
+const PESOS = { cobertura:0.60, nivel:0.25, centralidad:0.10, adyacencia:0.05, version:"1.0.0" };
+
+/* ---------------- preguntas del cuestionario ---------------- */
+const PREGUNTAS = [
+  { id:"rol", tipo:"multi", titulo:"¿Qué tipo de rol está buscando?",
+    ayuda:"Define contra qué nodos :Rol comparamos su perfil. Puede elegir varios.",
+    opciones:["Backend","Frontend","Full Stack","Datos e IA","DevOps / Nube","QA y pruebas","Diseño de producto","Ciberseguridad"] },
+  { id:"seniority", tipo:"single", titulo:"¿En qué nivel se ubica hoy?",
+    ayuda:"Lo usamos para comparar su nivel declarado contra el mínimo que exige cada vacante.",
+    opciones:["Practicante","Junior (0–2 años)","Semi-senior (2–5 años)","Senior (5–8 años)","Líder técnico (8+ años)"] },
+  { id:"skills", tipo:"skills", titulo:"¿Qué habilidades domina y en qué nivel?",
+    ayuda:"Esta es la pregunta que más pesa: cada habilidad se vuelve una arista :HAS_SKILL con su nivel de 1 a 5." },
+  { id:"aprender", tipo:"multi", titulo:"¿Qué está dispuesto a aprender en los próximos seis meses?",
+    ayuda:"Nos permite recomendarle vacantes que hoy no cubre pero que puede alcanzar cerrando una brecha corta.",
+    opciones:["Neo4j / Cypher","Kubernetes","AWS","TypeScript","Ciberseguridad","Pandas","Nada por ahora"] },
+  { id:"modalidad", tipo:"single", titulo:"¿Qué modalidad de trabajo necesita?",
+    ayuda:"Filtro duro: descartamos las vacantes que no cumplan esta condición.",
+    opciones:["Remoto","Híbrido","Presencial","Me da igual"] },
+  { id:"salario", tipo:"single", titulo:"¿Cuál es su expectativa salarial mensual?",
+    ayuda:"No se la mostramos al contratante. Solo la usamos para ordenar mejor sus resultados.",
+    opciones:["Hasta $3.000.000","$3.000.000 – $6.000.000","$6.000.000 – $9.000.000","$9.000.000 – $13.000.000","Más de $13.000.000"] },
+  { id:"disponibilidad", tipo:"single", titulo:"¿Cuándo podría empezar?",
+    ayuda:"Los contratantes con vacantes urgentes filtran por este campo.",
+    opciones:["Inmediatamente","En 15 días","En 30 días","Solo estoy explorando"] },
+  { id:"prioridad", tipo:"single", titulo:"Si tuviera que elegir una sola cosa, ¿qué le importa más?",
+    ayuda:"Desempata vacantes con ajuste parecido.",
+    opciones:["Salario","Aprender y crecer","Estabilidad","Balance con mi vida","Impacto del producto"] }
+];
+
+/* =====================================================================
+   Utilidades
+   ===================================================================== */
+const $ = (s, c=document) => c.querySelector(s);
+const $$ = (s, c=document) => [...c.querySelectorAll(s)];
+const cop = n => "$" + n.toLocaleString("es-CO");
+
+function ir(id){
+  $$("section").forEach(s => s.classList.add("hidden"));
+  $(id).classList.remove("hidden");
+  window.scrollTo({top:0});
+}
+let toastT;
+function toast(txt){
+  const t = $("#toast");
+  t.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#06D261" stroke-width="2.6" stroke-linecap="round"><path d="m4 12.5 5 5L20 6.5"/></svg><span>${txt}</span>`;
+  t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 3200);
+}
+function alerta(cont, tipo, texto){
+  const el = $(cont);
+  el.className = "alert alert-" + tipo;
+  el.innerHTML = (tipo==="error"
+    ? `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9.5"/></svg>`
+    : `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 16v-5M12 8h.01"/><circle cx="12" cy="12" r="9.5"/></svg>`)
+    + `<span>${texto}</span>`;
+  el.classList.remove("hidden");
+}
+function limpiarAlerta(cont){ $(cont).classList.add("hidden"); }
+
+/**
+ * Validación con la regla exigida por la asignatura:
+ * conserva lo ya digitado, resalta en rojo el primer campo pendiente y le da el foco.
+ */
+function validar(ids, contAlerta){
+  let primero = null;
+  ids.forEach(id => {
+    const el = $(id);
+    const vacio = el.type === "checkbox" ? !el.checked : !el.value.trim();
+    el.classList.toggle("is-invalid", vacio);
+    if (vacio && !primero) primero = el;
+  });
+  if (primero){
+    alerta(contAlerta, "error", MSG_OBLIG);
+    primero.focus();
+    primero.scrollIntoView({block:"center", behavior:"smooth"});
+    return false;
+  }
+  limpiarAlerta(contAlerta);
+  return true;
+}
+
+/* =====================================================================
+   Fondo animado de nodos (pantallas de autenticación)
+   ===================================================================== */
+(function red(){
+  const c = $("#netcanvas"); if(!c) return;
+  const x = c.getContext("2d");
+  let W, H, pts = [];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function size(){
+    W = c.width = c.offsetWidth * devicePixelRatio;
+    H = c.height = c.offsetHeight * devicePixelRatio;
+    pts = Array.from({length: 34}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      vx: (Math.random()-.5)*.22, vy: (Math.random()-.5)*.22,
+      r: (Math.random()*2.4+1.6) * devicePixelRatio
+    }));
+  }
+  function draw(){
+    x.clearRect(0,0,W,H);
+    pts.forEach(p => {
+      if(!reduce){ p.x += p.vx; p.y += p.vy; }
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+    });
+    pts.forEach((a,i) => pts.slice(i+1).forEach(b => {
+      const d = Math.hypot(a.x-b.x, a.y-b.y);
+      if(d < 190*devicePixelRatio){
+        x.strokeStyle = `rgba(103,194,236,${(1-d/(190*devicePixelRatio))*.4})`;
+        x.lineWidth = 1*devicePixelRatio;
+        x.beginPath(); x.moveTo(a.x,a.y); x.lineTo(b.x,b.y); x.stroke();
+      }
+    }));
+    pts.forEach(p => {
+      x.fillStyle = "rgba(6,210,97,.85)";
+      x.beginPath(); x.arc(p.x,p.y,p.r,0,7); x.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  addEventListener("resize", size); size(); draw();
+})();
+
+/* =====================================================================
+   1 · Pantalla de correo
+   ===================================================================== */
+$("#form-email").addEventListener("submit", e => {
+  e.preventDefault();
+  const el = $("#i-email"), v = el.value.trim().toLowerCase();
+  if(!v){ el.classList.add("is-invalid"); alerta("#email-alert","error",MSG_OBLIG); el.focus(); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v)){
+    el.classList.add("is-invalid");
+    alerta("#email-alert","error","Ese correo no tiene un formato válido. Revise que incluya @ y un dominio.");
+    el.focus(); return;
+  }
+  el.classList.remove("is-invalid"); limpiarAlerta("#email-alert");
+  state.email = v;
+
+  if(CUENTAS[v]){
+    $("#pw-email-echo").textContent = v;
+    limpiarAlerta("#pw-alert"); $("#i-pw").value = "";
+    ir("#s-password");
+  } else {
+    $("#i-mail2").value = v;
+    alerta("#su-alert","info","No encontramos una cuenta con <b>"+v+"</b>. Cree una para continuar.");
+    ir("#s-signup");
+    setTimeout(()=>$("#i-nom").focus(), 350);
+  }
+});
+
+$$("[data-sso]").forEach(b => b.addEventListener("click", () => {
+  const p = b.dataset.sso;
+  toast("Inicio de sesión con " + p + ": pendiente de integración OAuth (Sprint 2).");
+}));
+
+$$("[data-go]").forEach(b => b.addEventListener("click", () => ir("#" + b.dataset.go)));
+
+/* =====================================================================
+   2 · Contraseña
+   ===================================================================== */
+$("#form-pw").addEventListener("submit", e => {
+  e.preventDefault();
+  const el = $("#i-pw");
+  if(!el.value.trim()){ el.classList.add("is-invalid"); alerta("#pw-alert","error",MSG_OBLIG); el.focus(); return; }
+  if(el.value !== CUENTAS[state.email].pw){
+    el.classList.add("is-invalid");
+    alerta("#pw-alert","error","Las credenciales no coinciden. Verifique su contraseña.");
+    el.value = ""; el.focus(); return;
+  }
+  const c = CUENTAS[state.email];
+  state.user = { nombres:c.nombres, apellidos:c.apellidos, email:state.email };
+  entrarOnboarding();
+});
+
+/* =====================================================================
+   3 · Registro
+   ===================================================================== */
+$("#form-signup").addEventListener("submit", e => {
+  e.preventDefault();
+  const ids = ["#i-nom","#i-ape","#i-mail2","#i-tel","#i-ciudad","#i-pw1","#i-pw2","#i-hab"];
+  if(!validar(ids, "#su-alert")) return;
+
+  if($("#i-pw1").value !== $("#i-pw2").value){
+    $("#i-pw2").classList.add("is-invalid");
+    alerta("#su-alert","error","Las contraseñas no coinciden.");
+    $("#i-pw1").value = ""; $("#i-pw2").value = ""; $("#i-pw1").focus(); return;
+  }
+  if($("#i-pw1").value.length < 8){
+    $("#i-pw1").classList.add("is-invalid");
+    alerta("#su-alert","error","La contraseña debe tener al menos 8 caracteres.");
+    $("#i-pw1").focus(); return;
+  }
+  if(!/^\d{7,10}$/.test($("#i-tel").value.trim())){
+    $("#i-tel").classList.add("is-invalid");
+    alerta("#su-alert","error","El teléfono debe tener entre 7 y 10 dígitos, sin espacios ni guiones.");
+    $("#i-tel").focus(); return;
+  }
+
+  state.email = $("#i-mail2").value.trim().toLowerCase();
+  state.user = { nombres:$("#i-nom").value.trim(), apellidos:$("#i-ape").value.trim(),
+                 email:state.email, telefono:$("#i-tel").value.trim(), ciudad:$("#i-ciudad").value };
+  CUENTAS[state.email] = { pw:$("#i-pw1").value, nombres:state.user.nombres, apellidos:state.user.apellidos };
+  toast("Cuenta creada. Bienvenido a SkillGraph AI.");
+  entrarOnboarding();
+});
+
+function entrarOnboarding(){
+  pintarCuestionario();
+  dibujarGrafoVivo();
+  ir("#s-quiz");
+}
+
+/* =====================================================================
+   4 · Cuestionario
+   ===================================================================== */
+function pintarCuestionario(){
+  const cont = $("#quiz-body");
+  cont.innerHTML = PREGUNTAS.map((p, i) => {
+    let cuerpo;
+    if(p.tipo === "skills"){
+      cuerpo = `
+        <div class="row wrap" id="skill-picker">
+          ${CATALOGO.map(s => `<button type="button" class="chip" data-skill="${s}" aria-pressed="false">${s}</button>`).join("")}
+        </div>
+        <div id="skill-levels" style="margin-top:16px"></div>`;
+    } else {
+      cuerpo = `<div class="opt-grid">${p.opciones.map(o => `
+        <button type="button" class="opt" data-q="${p.id}" data-tipo="${p.tipo}" data-v="${o}" aria-pressed="false">
+          <span class="tick"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="m4 12.5 5 5L20 6.5"/></svg></span>
+          <span>${o}</span></button>`).join("")}</div>`;
+    }
+    return `<div class="q-block">
+      <p class="q-num">PREGUNTA ${String(i+1).padStart(2,"0")}${p.tipo==="multi"?" · varias opciones":""}</p>
+      <h3 class="q-title">${p.titulo}</h3>
+      <p class="q-help">${p.ayuda}</p>
+      ${cuerpo}
+    </div>`;
+  }).join("");
+
+  $$("#quiz-body .opt").forEach(b => b.addEventListener("click", () => {
+    const {q, tipo, v} = b.dataset;
+    if(tipo === "single"){
+      $$(`#quiz-body .opt[data-q="${q}"]`).forEach(o => o.setAttribute("aria-pressed","false"));
+      b.setAttribute("aria-pressed","true");
+      state.respuestas[q] = v;
+    } else {
+      const on = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", String(!on));
+      const set = new Set(state.respuestas[q] || []);
+      on ? set.delete(v) : set.add(v);
+      state.respuestas[q] = [...set];
+      if(!state.respuestas[q].length) delete state.respuestas[q];
+    }
+    actualizarQuiz();
+  }));
+
+  $$("#skill-picker .chip").forEach(b => b.addEventListener("click", () => {
+    const s = b.dataset.skill;
+    if(state.skills[s] !== undefined){ delete state.skills[s]; b.setAttribute("aria-pressed","false"); }
+    else { state.skills[s] = 3; b.setAttribute("aria-pressed","true"); }
+    pintarNiveles(); actualizarQuiz();
+  }));
+}
+
+function pintarNiveles(){
+  const c = $("#skill-levels"); if(!c) return;
+  const ss = Object.keys(state.skills);
+  if(!ss.length){ c.innerHTML = `<p class="small muted">Seleccione al menos tres habilidades para que el motor pueda calcular su ajuste.</p>`; return; }
+  c.innerHTML = `<p class="lbl">Nivel de dominio · 1 = básico, 5 = experto</p>` + ss.map(s => `
+    <div class="skill-row">
+      <span class="nm">${s}</span>
+      <div class="lvl">${[1,2,3,4,5].map(n =>
+        `<button type="button" data-s="${s}" data-n="${n}" aria-pressed="${state.skills[s]===n}">${n}</button>`).join("")}</div>
+    </div>`).join("");
+  $$("#skill-levels .lvl button").forEach(b => b.addEventListener("click", () => {
+    state.skills[b.dataset.s] = +b.dataset.n;
+    pintarNiveles(); dibujarGrafoVivo();
+  }));
+}
+
+function actualizarQuiz(){
+  const n = PREGUNTAS.filter(p => p.tipo === "skills"
+      ? Object.keys(state.skills).length > 0
+      : state.respuestas[p.id] !== undefined).length;
+  $("#quiz-count").textContent = `${n} de ${PREGUNTAS.length} preguntas respondidas`;
+  dibujarGrafoVivo();
+}
+
+function dibujarGrafoVivo(){
+  const svg = $("#live-graph"); if(!svg) return;
+  const nodos = [];
+  (state.respuestas.rol || []).forEach(v => nodos.push({t:v, c:"#67C2EC"}));
+  Object.keys(state.skills).forEach(s => nodos.push({t:s, c:"#06D261"}));
+  if(state.respuestas.modalidad) nodos.push({t:state.respuestas.modalidad, c:"#FFFFFF"});
+  if(state.respuestas.seniority) nodos.push({t:state.respuestas.seniority.split(" ")[0], c:"#FFFFFF"});
+  (state.respuestas.aprender || []).filter(v=>v!=="Nada por ahora").forEach(v => nodos.push({t:v, c:"#C77B18"}));
+
+  const cx = 160, cy = 170, vis = nodos.slice(0, 16);
+  let html = "";
+  vis.forEach((n, i) => {
+    const a = (i / Math.max(vis.length,1)) * Math.PI * 2 - Math.PI/2;
+    const r = vis.length > 9 ? (i % 2 ? 132 : 96) : 112;
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    html += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(103,194,236,.45)" stroke-width="1.2"/>`;
+    html += `<g class="pop" style="animation-delay:${i*.03}s">
+        <circle cx="${x}" cy="${y}" r="5.5" fill="${n.c}"/>
+        <text class="gnode-label" x="${x}" y="${y - 11}" text-anchor="middle">${n.t.length>13?n.t.slice(0,12)+"…":n.t}</text>
+      </g>`;
+  });
+  html += `<circle cx="${cx}" cy="${cy}" r="27" fill="#67C2EC"/>
+           <text x="${cx}" y="${cy+1}" text-anchor="middle" font-size="11" font-weight="700" fill="#002443">Usted</text>
+           <text x="${cx}" y="${cy+13}" text-anchor="middle" font-size="7.5" fill="#00385F">:Candidato</text>`;
+  svg.innerHTML = html;
+  $("#node-count").textContent = vis.length + 1;
+}
+
+$("#quiz-next").addEventListener("click", () => {
+  const faltan = PREGUNTAS.filter(p => p.tipo === "skills"
+      ? Object.keys(state.skills).length === 0
+      : state.respuestas[p.id] === undefined);
+  if(faltan.length){
+    alerta("#quiz-alert","error", MSG_OBLIG + " Faltan " + faltan.length + " respuesta(s).");
+    const i = PREGUNTAS.indexOf(faltan[0]);
+    $$("#quiz-body .q-block")[i].scrollIntoView({block:"center", behavior:"smooth"});
+    return;
+  }
+  if(Object.keys(state.skills).length < 3){
+    alerta("#quiz-alert","error","Seleccione al menos tres habilidades para poder calcular su ajuste.");
+    return;
+  }
+  limpiarAlerta("#quiz-alert");
+  prellenarPerfil();
+  ir("#s-profile");
+});
+
+/* =====================================================================
+   5 · Perfil y documentos
+   ===================================================================== */
+function prellenarPerfil(){
+  const u = state.user || {};
+  $("#p-nombre").value = [u.nombres, u.apellidos].filter(Boolean).join(" ");
+  $("#p-mail").value = u.email || "";
+  $("#p-tel").value = u.telefono || "";
+  $("#p-ciudad").value = u.ciudad ? u.ciudad + ", Colombia" : "";
+  const sen = state.respuestas.seniority || "";
+  const m = sen.match(/(\d+)/);
+  if(m) $("#p-anios").value = m[1];
+}
+
+$$("[data-drop]").forEach(z => {
+  const input = $("input", z), key = z.dataset.drop;
+  z.addEventListener("click", () => input.click());
+  z.addEventListener("dragover", e => { e.preventDefault(); z.classList.add("over"); });
+  z.addEventListener("dragleave", () => z.classList.remove("over"));
+  z.addEventListener("drop", e => {
+    e.preventDefault(); z.classList.remove("over");
+    if(e.dataTransfer.files.length) marcarArchivo(z, key, e.dataTransfer.files[0]);
+  });
+  input.addEventListener("change", () => { if(input.files.length) marcarArchivo(z, key, input.files[0]); });
+});
+
+function marcarArchivo(zona, key, file){
+  state.docs[key] = { nombre:file.name, kb:Math.round(file.size/1024) };
+  zona.classList.add("filled");
+  $(".dz", zona).innerHTML = `
+    <div class="file-pill">
+      <span class="file-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="m4 12.5 5 5L20 6.5"/></svg></span>
+      <span><b style="font-size:13.5px">${file.name}</b>
+        <span class="tiny muted" style="display:block">${state.docs[key].kb} KB · cargado</span></span>
+    </div>`;
+  if(key === "cv") toast("Hoja de vida cargada. Detectamos " + Object.keys(state.skills).length + " habilidades ya declaradas.");
+}
+
+$("#form-profile").addEventListener("submit", e => {
+  e.preventDefault();
+  const ids = ["#p-nombre","#p-nac","#p-tipodoc","#p-doc","#p-tel","#p-mail","#p-dir","#p-ciudad","#p-edu","#p-anios"];
+  if(!validar(ids, "#prof-alert")) return;
+  if(!/^\d{6,12}$/.test($("#p-doc").value.trim())){
+    $("#p-doc").classList.add("is-invalid");
+    alerta("#prof-alert","error","El número de documento debe contener entre 6 y 12 dígitos.");
+    $("#p-doc").focus(); return;
+  }
+  if(!state.docs.cv){
+    alerta("#prof-alert","error","Cargue su hoja de vida para continuar. Es obligatoria para postularse.");
+    $("[data-drop='cv']").scrollIntoView({block:"center", behavior:"smooth"});
+    return;
+  }
+  ids.forEach(i => state.perfil[i.slice(3)] = $(i).value.trim());
+  limpiarAlerta("#prof-alert");
+  abrirApp();
+  toast("Perfil guardado. Estas son sus recomendaciones.");
+});
+
+/* =====================================================================
+   6 · Motor de recomendación (mismo cálculo del documento)
+   ===================================================================== */
+function calcular(v){
+  let total = 0, cubierto = 0, nivelPond = 0;
+  const cubiertas = [], faltantes = [];
+  v.req.forEach(([nombre, peso, min]) => {
+    total += peso;
+    const declarado = state.skills[nombre];
+    if(declarado !== undefined){
+      cubierto += peso;
+      nivelPond += peso * Math.min(1, declarado / min);
+      cubiertas.push({nombre, peso, nivel:declarado});
+    } else {
+      faltantes.push({nombre, peso, min});
+    }
+  });
+  const cobertura = total ? cubierto/total : 0;
+  const nivel = cubierto ? nivelPond/cubierto : 0;
+  const aprender = new Set(state.respuestas.aprender || []);
+  const adyacencia = faltantes.length
+    ? faltantes.filter(f => aprender.has(f.nombre)).length / faltantes.length * .9 + .1
+    : 0.9;
+  const score = PESOS.cobertura*cobertura + PESOS.nivel*nivel
+              + PESOS.centralidad*v.centralidad + PESOS.adyacencia*adyacencia;
+  const potencial = PESOS.cobertura*1 + PESOS.nivel*Math.max(nivel,.9)
+              + PESOS.centralidad*v.centralidad + PESOS.adyacencia*adyacencia;
+  return {
+    pct: Math.round(score*100), pctPot: Math.round(Math.min(potencial,1)*100),
+    cobertura, nivel, centralidad:v.centralidad, adyacencia, cubiertas,
+    faltantes: faltantes.sort((a,b)=>b.peso-a.peso)
+  };
+}
+
+function texto(v, m){
+  const n = v.req.length;
+  let t = `Usted cubre ${m.cubiertas.length} de las ${n} habilidades que exige esta vacante`;
+  t += m.cubiertas.length ? ` (${m.cubiertas.map(c=>c.nombre).join(", ")}), que concentran el ${Math.round(m.cobertura*100)} % del peso definido por el contratante.` : ".";
+  if(m.faltantes.length){
+    const p = m.faltantes[0];
+    t += ` Le falta ${p.nombre} (peso ${p.peso.toFixed(2)}, nivel mínimo ${p.min}). Cerrar esa brecha llevaría su ajuste de ${m.pct} % a ${m.pctPot} %.`;
+  } else {
+    t += " No tiene brechas: cubre el total de las habilidades requeridas.";
+  }
+  return t;
+}
+
+/* =====================================================================
+   7 · Interfaz de la aplicación
+   ===================================================================== */
+function abrirApp(){
+  const u = state.user || {};
+  $("#greet").textContent = "Hola, " + (u.nombres || "").split(" ")[0];
+  $("#rail-avatar").textContent = ((u.nombres||"A")[0] + (u.apellidos||"R")[0]).toUpperCase();
+  pintarFiltros(); pintarRecientes(); pintarVacantes(); pintarAjustes();
+  ir("#s-app");
+}
+
+$$(".rail-btn").forEach(b => b.addEventListener("click", () => {
+  $$(".rail-btn").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  state.tab = b.dataset.tab;
+  ["search","saved","settings"].forEach(t => $("#tab-"+t).classList.toggle("hidden", t !== state.tab));
+  if(state.tab === "saved") pintarGuardadas();
+  if(state.tab === "settings") pintarAjustes();
+  window.scrollTo({top:0});
+}));
+
+const FILTROS = ["todas","Remoto","Híbrido","Presencial","Medellín","Bogotá","Sin brechas"];
+function pintarFiltros(){
+  $("#filters").innerHTML = FILTROS.map(f =>
+    `<button class="chip" data-f="${f}" aria-pressed="${state.filtro===f}">${f==="todas"?"Todas":f}</button>`).join("");
+  $$("#filters .chip").forEach(b => b.addEventListener("click", () => {
+    state.filtro = b.dataset.f; pintarFiltros(); pintarVacantes();
+  }));
+}
+
+function pintarRecientes(){
+  const c = $("#recents-list");
+  if(!state.recientes.length){ c.innerHTML = `<p class="small muted">Todavía no ha hecho búsquedas.</p>`; return; }
+  c.innerHTML = state.recientes.map(r => `
+    <button class="chip chip-soft" data-r="${r}">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      ${r}</button>`).join("");
+  $$("#recents-list .chip").forEach(b => b.addEventListener("click", () => {
+    $("#q").value = b.dataset.r; buscar();
+  }));
+}
+
+function buscar(){
+  const q = $("#q").value.trim();
+  state.query = q.toLowerCase();
+  if(q){
+    state.recientes = [q, ...state.recientes.filter(r => r.toLowerCase() !== q.toLowerCase())].slice(0,6);
+    pintarRecientes();
+  }
+  $("#results-title").textContent = q ? `Resultados para "${q}"` : "Recomendadas para usted";
+  pintarVacantes();
+}
+$("#btn-search").addEventListener("click", buscar);
+$("#q").addEventListener("keydown", e => { if(e.key === "Enter") buscar(); });
+$("#sort").addEventListener("change", e => { state.orden = e.target.value; pintarVacantes(); });
+$("#clear-recents").addEventListener("click", () => {
+  state.recientes = []; pintarRecientes(); toast("Historial de búsquedas borrado.");
+});
+$("#btn-edit-skills").addEventListener("click", () => {
+  $$(".rail-btn").forEach(x => x.classList.remove("active"));
+  $('[data-tab="settings"]').classList.add("active");
+  state.tab = "settings"; state.stab = "hv";
+  ["search","saved","settings"].forEach(t => $("#tab-"+t).classList.toggle("hidden", t !== "settings"));
+  pintarAjustes();
+});
+
+function filtrar(){
+  let lista = VACANTES.map(v => ({v, m:calcular(v)}));
+  if(state.query){
+    lista = lista.filter(({v}) =>
+      (v.titulo+" "+v.empresa+" "+v.ciudad+" "+v.modalidad+" "+v.req.map(r=>r[0]).join(" ")).toLowerCase().includes(state.query));
+  }
+  if(state.filtro !== "todas"){
+    if(state.filtro === "Sin brechas") lista = lista.filter(({m}) => m.faltantes.length === 0);
+    else lista = lista.filter(({v}) => v.modalidad === state.filtro || v.ciudad === state.filtro);
+  }
+  const ord = { match:(a,b)=>b.m.pct-a.m.pct, salary:(a,b)=>b.v.salario-a.v.salario, recent:(a,b)=>a.v.dias-b.v.dias };
+  return lista.sort(ord[state.orden]);
+}
+
+function tarjeta(v, m, idx){
+  const guardada = state.guardadas.has(v.id);
+  const col = m.pct>=75 ? "var(--green)" : m.pct>=50 ? "var(--sky)" : "var(--line-strong)";
+  const dash = Math.round(m.pct/100*163);
+  return `
+  <article class="job rise" style="animation-delay:${idx*.04}s" data-id="${v.id}">
+    <div class="job-top">
+      <span class="logo-sq">${v.sigla}</span>
+      <div class="grow">
+        <h3>${v.titulo}</h3>
+        <p class="meta">${v.empresa} · ${v.ciudad} · ${v.modalidad} · ${cop(v.salario)} · hace ${v.dias} d</p>
+        <div class="tags">
+          ${m.cubiertas.map(c=>`<span class="tag tag-ok">${c.nombre} ✓</span>`).join("")}
+          ${m.faltantes.map(f=>`<span class="tag tag-miss">${f.nombre} · falta</span>`).join("")}
+        </div>
+      </div>
+      <div class="score">
+        <div class="ring">
+          <svg width="66" height="66"><circle cx="33" cy="33" r="26" fill="none" stroke="var(--line)" stroke-width="7"/>
+            <circle cx="33" cy="33" r="26" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round"
+              stroke-dasharray="${dash} 163"/></svg>
+          <b style="color:${col}">${m.pct}%</b>
+        </div>
+        <span class="tiny muted">de ajuste</span>
+      </div>
+    </div>
+    <div class="job-actions">
+      <button class="heart ${guardada?"on":""}" data-like="${v.id}" aria-label="Guardar vacante" aria-pressed="${guardada}">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="${guardada?"currentColor":"none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+          <path d="M12 20.5s-7.5-4.7-7.5-9.7a4.3 4.3 0 0 1 7.5-2.8 4.3 4.3 0 0 1 7.5 2.8c0 5-7.5 9.7-7.5 9.7z"/></svg>
+      </button>
+      <button class="btn btn-ghost" data-why="${v.id}">Ver por qué ${m.pct} %</button>
+      <button class="btn btn-accent" data-apply="${v.id}">Postularme</button>
+    </div>
+    <div class="explain hidden" id="ex-${v.id}">
+      ${["Cobertura ponderada de habilidades|"+m.cobertura+"|"+PESOS.cobertura+"|",
+         "Nivel declarado vs. nivel exigido|"+m.nivel+"|"+PESOS.nivel+"|",
+         "Centralidad del rol en el grafo|"+m.centralidad+"|"+PESOS.centralidad+"|blue",
+         "Afinidad con habilidades adyacentes|"+m.adyacencia+"|"+PESOS.adyacencia+"|navy"]
+        .map(s => { const [n,val,pond,cls] = s.split("|"); return `
+        <div class="comp"><span class="cn">${n}</span>
+          <span class="bar"><i class="${cls}" style="width:${(+val*100).toFixed(0)}%"></i></span>
+          <span class="cv">${(+val).toFixed(2)} × ${Math.round(+pond*100)} %</span></div>`; }).join("")}
+      <div class="comp" style="border-top:1px solid var(--line);padding-top:10px;margin-top:10px">
+        <span class="cn" style="font-weight:700">Puntaje final</span><span class="bar" style="background:none"></span>
+        <span class="cv" style="color:var(--green);font-weight:700;font-size:13px">${(m.pct/100).toFixed(2)}</span>
+      </div>
+      <div class="mini-graph">${subgrafo(v, m)}</div>
+      <div class="explain-box">${texto(v, m)}</div>
+      <p class="tiny muted" style="margin-top:10px">Versión del algoritmo ${PESOS.version} · vacante #${v.id} · cálculo reproducible</p>
+    </div>
+  </article>`;
+}
+
+function subgrafo(v, m){
+  const items = [...m.cubiertas.map(c=>({n:c.nombre, ok:true})), ...m.faltantes.map(f=>({n:f.nombre, ok:false}))];
+  const h = Math.max(150, items.length*34 + 30), cy = h/2;
+  let s = `<svg viewBox="0 0 520 ${h}" style="width:100%;height:${h}px">`;
+  items.forEach((it, i) => {
+    const y = 28 + i*34;
+    s += `<line x1="112" y1="${cy}" x2="196" y2="${y}" stroke="${it.ok?"#0DBA4E":"#D6455B"}"
+            stroke-width="${it.ok?2:1.4}" ${it.ok?"":'stroke-dasharray="4 3"'}/>`;
+    s += `<line x1="330" y1="${y}" x2="410" y2="${cy}" stroke="#67C2EC" stroke-width="1.6"/>`;
+    s += `<rect x="196" y="${y-13}" width="134" height="26" rx="8" fill="${it.ok?"var(--green-soft)":"var(--danger-soft)"}"
+            stroke="${it.ok?"#0DBA4E":"#D6455B"}" stroke-width="1.4"/>`;
+    s += `<text x="263" y="${y+4}" text-anchor="middle" font-size="11" font-weight="600"
+            fill="${it.ok?"#0A6B32":"#D6455B"}">${it.n.length>17?it.n.slice(0,16)+"…":it.n}</text>`;
+  });
+  s += `<circle cx="70" cy="${cy}" r="34" fill="#1F5172"/>
+        <text x="70" y="${cy-1}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Usted</text>
+        <text x="70" y="${cy+11}" text-anchor="middle" font-size="8" fill="#B9D5E5">:Candidato</text>
+        <rect x="410" y="${cy-24}" width="96" height="48" rx="10" fill="var(--sky-soft)" stroke="#67C2EC" stroke-width="1.6"/>
+        <text x="458" y="${cy-3}" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--navy)">${v.sigla}</text>
+        <text x="458" y="${cy+11}" text-anchor="middle" font-size="8.5" fill="var(--navy-2)">:Vacante</text>
+        <text x="150" y="16" font-size="8.5" fill="#0A6B32">:HAS_SKILL</text>
+        <text x="345" y="16" font-size="8.5" fill="var(--navy-2)">:REQUIRES_SKILL</text></svg>`;
+  return s;
+}
+
+function pintarVacantes(){
+  const lista = filtrar(), c = $("#jobs");
+  if(!lista.length){
+    c.innerHTML = `<div class="empty">
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <h3>Ninguna vacante coincide con ese filtro</h3>
+      <p>Pruebe con otro término, quite los filtros o agregue habilidades a su perfil para ampliar los resultados.</p>
+      <button class="btn btn-ghost" onclick="document.querySelector('#q').value='';document.querySelector('[data-f=todas]').click()">Ver todas las vacantes</button>
+    </div>`;
+    return;
+  }
+  c.innerHTML = lista.map(({v,m}, i) => tarjeta(v, m, i)).join("");
+  enlazarTarjetas(c);
+}
+
+function enlazarTarjetas(cont){
+  $$("[data-why]", cont).forEach(b => {
+    b.dataset.label = b.textContent.trim();
+    b.addEventListener("click", () => {
+      const ex = $("#ex-"+b.dataset.why);
+      const abierto = !ex.classList.contains("hidden");
+      ex.classList.toggle("hidden");
+      b.textContent = abierto ? b.dataset.label : "Ocultar el cálculo";
+      b.setAttribute("aria-expanded", String(!abierto));
+    });
+  });
+  $$("[data-like]", cont).forEach(b => b.addEventListener("click", () => {
+    const id = +b.dataset.like;
+    state.guardadas.has(id) ? state.guardadas.delete(id) : state.guardadas.add(id);
+    const g = state.guardadas.has(id);
+    b.classList.toggle("on", g);
+    b.setAttribute("aria-pressed", String(g));
+    $("svg", b).setAttribute("fill", g ? "currentColor" : "none");
+    badge();
+    toast(g ? "Vacante guardada en sus favoritos." : "Vacante retirada de sus favoritos.");
+    if(state.tab === "saved") pintarGuardadas();
+  }));
+  $$("[data-apply]", cont).forEach(b => b.addEventListener("click", () => {
+    const v = VACANTES.find(x => x.id === +b.dataset.apply);
+    b.textContent = "Postulación enviada";
+    b.classList.remove("btn-accent"); b.classList.add("btn-ghost"); b.disabled = true;
+    toast("Postulación enviada a " + v.empresa + ". Su hoja de vida y documentos fueron compartidos.");
+  }));
+}
+
+function badge(){
+  const b = $("#saved-badge"), n = state.guardadas.size;
+  b.textContent = n; b.classList.toggle("hidden", n === 0);
+}
+
+function pintarGuardadas(){
+  const c = $("#saved-list");
+  const lista = VACANTES.filter(v => state.guardadas.has(v.id)).map(v => ({v, m:calcular(v)}));
+  if(!lista.length){
+    c.innerHTML = `<div class="empty">
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+        <path d="M12 20.5s-7.5-4.7-7.5-9.7a4.3 4.3 0 0 1 7.5-2.8 4.3 4.3 0 0 1 7.5 2.8c0 5-7.5 9.7-7.5 9.7z"/></svg>
+      <h3>Todavía no ha guardado vacantes</h3>
+      <p>Toque el corazón en cualquier vacante para guardarla aquí y hacerle seguimiento.</p>
+      <button class="btn btn-primary" onclick="document.querySelector('[data-tab=search]').click()">Buscar empleo</button>
+    </div>`;
+    return;
+  }
+  c.innerHTML = lista.map(({v,m}, i) => tarjeta(v, m, i)).join("");
+  enlazarTarjetas(c);
+}
+
+/* =====================================================================
+   8 · Ajustes
+   ===================================================================== */
+$$("#settings-tabs .tab").forEach(t => t.addEventListener("click", () => {
+  state.stab = t.dataset.st; pintarAjustes();
+}));
+
+function pintarAjustes(){
+  $$("#settings-tabs .tab").forEach(t => t.classList.toggle("active", t.dataset.st === state.stab));
+  const c = $("#settings-body");
+  const p = state.perfil, u = state.user || {};
+
+  if(state.stab === "perfil"){
+    c.innerHTML = `
+      <div class="card">
+        <h3>Información personal</h3>
+        <p class="small muted">Los cambios se reflejan de inmediato en las postulaciones que envíe.</p>
+        <div class="grid-2" style="margin-top:18px">
+          ${campo("Nombre completo", p.nombre || [u.nombres,u.apellidos].join(" "))}
+          ${campo("Documento", (p.tipodoc||"Cédula de ciudadanía") + " " + (p.documento||""))}
+          ${campo("Teléfono", p.tel || u.telefono || "")}
+          ${campo("Correo electrónico", p.mail || u.email || "")}
+          ${campo("Dirección", p.dir || "")}
+          ${campo("Ciudad", p.ciudad || "")}
+        </div>
+        <div class="row" style="margin-top:20px">
+          <button class="btn btn-primary" onclick="toast('Cambios guardados en su perfil.')">Guardar cambios</button>
+          <button class="btn btn-ghost" onclick="toast('Se envió un enlace de verificación a su correo.')">Verificar identidad</button>
+        </div>
+      </div>`;
+  }
+
+  if(state.stab === "hv"){
+    const ss = Object.entries(state.skills);
+    c.innerHTML = `
+      <div class="card">
+        <h3>Hoja de vida</h3>
+        <p class="small muted">Reemplácela cuando cambie su experiencia. Volvemos a extraer habilidades automáticamente.</p>
+        <div class="row center between" style="margin-top:16px;padding:14px;border:1.5px solid var(--line);border-radius:12px;flex-wrap:wrap;gap:12px">
+          <div class="file-pill">
+            <span class="file-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+            <span><b style="font-size:13.5px">${state.docs.cv ? state.docs.cv.nombre : "hoja_de_vida.pdf"}</b>
+            <span class="tiny muted" style="display:block">${state.docs.cv ? state.docs.cv.kb + " KB" : "sin archivo"} · actualizada hoy</span></span>
+          </div>
+          <div class="row">
+            <button class="btn btn-ghost" onclick="toast('Se abriría el selector de archivos.')">Reemplazar</button>
+            <button class="btn btn-quiet" onclick="toast('Descargando su hoja de vida.')">Descargar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Habilidades declaradas (${ss.length})</h3>
+        <p class="small muted">Cambiar un nivel recalcula todos sus porcentajes de ajuste.</p>
+        <div style="margin-top:14px">
+          ${ss.map(([s,n]) => `
+            <div class="skill-row">
+              <span class="nm">${s}</span>
+              <div class="lvl">${[1,2,3,4,5].map(k =>
+                `<button type="button" data-cs="${s}" data-cn="${k}" aria-pressed="${n===k}">${k}</button>`).join("")}</div>
+              <button class="btn-quiet tiny" data-del="${s}" style="color:var(--danger)">Quitar</button>
+            </div>`).join("")}
+        </div>
+        <div class="row wrap" style="margin-top:18px">
+          ${CATALOGO.filter(s => state.skills[s] === undefined).map(s =>
+            `<button class="chip" data-add="${s}">+ ${s}</button>`).join("")}
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Lo que respondió en el cuestionario</h3>
+        <div class="grid-2" style="margin-top:14px">
+          ${PREGUNTAS.filter(q => q.tipo !== "skills").map(q => campo(q.titulo,
+            Array.isArray(state.respuestas[q.id]) ? state.respuestas[q.id].join(", ") : (state.respuestas[q.id] || "—"))).join("")}
+        </div>
+        <button class="btn btn-ghost" style="margin-top:18px" id="redo-quiz">Responder el cuestionario otra vez</button>
+      </div>`;
+
+    $$("[data-cs]").forEach(b => b.addEventListener("click", () => {
+      state.skills[b.dataset.cs] = +b.dataset.cn; pintarAjustes(); pintarVacantes();
+      toast("Nivel actualizado. Sus porcentajes de ajuste se recalcularon.");
+    }));
+    $$("[data-del]").forEach(b => b.addEventListener("click", () => {
+      delete state.skills[b.dataset.del]; pintarAjustes(); pintarVacantes();
+      toast("Habilidad retirada de su perfil.");
+    }));
+    $$("[data-add]").forEach(b => b.addEventListener("click", () => {
+      state.skills[b.dataset.add] = 3; pintarAjustes(); pintarVacantes();
+      toast("Habilidad agregada con nivel 3. Ajústelo si es necesario.");
+    }));
+    $("#redo-quiz").addEventListener("click", () => {
+      pintarCuestionario();
+      Object.entries(state.respuestas).forEach(([q,v]) => {
+        const vals = Array.isArray(v) ? v : [v];
+        vals.forEach(val => { const b = $(`#quiz-body .opt[data-q="${q}"][data-v="${val}"]`); if(b) b.setAttribute("aria-pressed","true"); });
+      });
+      Object.keys(state.skills).forEach(s => { const b = $(`#skill-picker .chip[data-skill="${s}"]`); if(b) b.setAttribute("aria-pressed","true"); });
+      pintarNiveles(); actualizarQuiz(); ir("#s-quiz");
+    });
+  }
+
+  if(state.stab === "app"){
+    c.innerHTML = `
+      <div class="card">
+        <h3>Apariencia</h3>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Modo oscuro</b>
+            <p class="small muted">Reduce el brillo para ambientes con poca luz. Se aplica a toda la aplicación.</p></div>
+          <button class="switch" id="sw-dark" role="switch" aria-checked="${state.tema==="dark"}"></button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Texto más grande</b>
+            <p class="small muted">Aumenta el tamaño base para mejorar la lectura.</p></div>
+          <button class="switch" id="sw-text" role="switch" aria-checked="false"></button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Reducir animaciones</b>
+            <p class="small muted">Desactiva transiciones y movimiento en la interfaz.</p></div>
+          <button class="switch" id="sw-anim" role="switch" aria-checked="false"></button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3>Notificaciones</h3>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Nuevas vacantes con alto ajuste</b>
+            <p class="small muted">Le escribimos cuando aparezca una vacante con más de 75 % de ajuste.</p></div>
+          <button class="switch" role="switch" aria-checked="true" onclick="alternar(this)"></button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Cambios de estado en sus postulaciones</b>
+            <p class="small muted">Avance, rechazo o solicitud de entrevista.</p></div>
+          <button class="switch" role="switch" aria-checked="true" onclick="alternar(this)"></button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Sugerencias de formación</b>
+            <p class="small muted">Cursos para cerrar las brechas que más le cuestan puntos.</p></div>
+          <button class="switch" role="switch" aria-checked="false" onclick="alternar(this)"></button>
+        </div>
+      </div>`;
+
+    $("#sw-dark").addEventListener("click", function(){
+      state.tema = state.tema === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = state.tema;
+      this.setAttribute("aria-checked", String(state.tema === "dark"));
+      toast(state.tema === "dark" ? "Modo oscuro activado." : "Modo claro activado.");
+    });
+    $("#sw-text").addEventListener("click", function(){
+      const on = this.getAttribute("aria-checked") !== "true";
+      this.setAttribute("aria-checked", String(on));
+      document.body.style.fontSize = on ? "17px" : "";
+      toast(on ? "Texto ampliado." : "Tamaño de texto restablecido.");
+    });
+    $("#sw-anim").addEventListener("click", function(){
+      const on = this.getAttribute("aria-checked") !== "true";
+      this.setAttribute("aria-checked", String(on));
+      document.body.style.setProperty("--ease", on ? "linear" : "cubic-bezier(.22,.61,.36,1)");
+      toast(on ? "Animaciones reducidas." : "Animaciones restablecidas.");
+    });
+  }
+
+  if(state.stab === "priv"){
+    c.innerHTML = `
+      <div class="card">
+        <h3>Sus datos</h3>
+        <p class="small muted">Tratamos su información conforme a la Ley 1581 de 2012 de protección de datos personales.</p>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Visibilidad de su perfil</b>
+            <p class="small muted">Los contratantes pueden encontrarlo en búsquedas por habilidades.</p></div>
+          <button class="switch" role="switch" aria-checked="true" onclick="alternar(this)"></button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Compartir documentos automáticamente</b>
+            <p class="small muted">Si lo desactiva, le pediremos autorización en cada postulación.</p></div>
+          <button class="switch" role="switch" aria-checked="false" onclick="alternar(this)"></button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Registro de recomendaciones</b>
+            <p class="small muted">Guardamos cómo se calculó cada resultado para que usted pueda reclamarlo.</p></div>
+          <button class="switch" role="switch" aria-checked="true" onclick="alternar(this)"></button>
+        </div>
+        <div class="row wrap" style="margin-top:20px">
+          <button class="btn btn-ghost" onclick="toast('Generando el archivo con todos sus datos.')">Descargar mis datos</button>
+          <button class="btn btn-ghost" onclick="toast('Se abriría la confirmación de eliminación de cuenta.')" style="color:var(--danger);border-color:var(--danger)">Eliminar mi cuenta</button>
+        </div>
+      </div>`;
+  }
+
+  if(state.stab === "cuenta"){
+    c.innerHTML = `
+      <div class="card">
+        <h3>Sesión</h3>
+        <div class="setting">
+          <div><b style="font-size:14.5px">${u.email || ""}</b>
+            <p class="small muted">Sesión iniciada con correo y contraseña.</p></div>
+          <button class="btn btn-ghost" id="logout">Cerrar sesión</button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Cambiar contraseña</b>
+            <p class="small muted">Le enviaremos un enlace seguro a su correo.</p></div>
+          <button class="btn btn-quiet" onclick="toast('Enlace de cambio de contraseña enviado.')">Enviar enlace</button>
+        </div>
+        <div class="setting">
+          <div><b style="font-size:14.5px">Cuentas vinculadas</b>
+            <p class="small muted">Google, Apple y Microsoft: pendientes de integración OAuth.</p></div>
+          <button class="btn btn-quiet" onclick="toast('Disponible en el Sprint 2.')">Vincular</button>
+        </div>
+      </div>`;
+    $("#logout").addEventListener("click", () => {
+      state.user = null; state.guardadas.clear(); badge();
+      $("#i-email").value = ""; $("#i-pw").value = "";
+      limpiarAlerta("#email-alert");
+      ir("#s-email");
+      toast("Sesión cerrada.");
+    });
+  }
+}
+
+function campo(l, v){
+  return `<div class="field"><label>${l}</label><input class="input" value="${(v||"").replace(/"/g,'&quot;')}"></div>`;
+}
+function alternar(b){
+  const on = b.getAttribute("aria-checked") !== "true";
+  b.setAttribute("aria-checked", String(on));
+}
+
+/* atajo de demostración: Alt + D salta directo a la aplicación con datos cargados */
+addEventListener("keydown", e => {
+  if(e.altKey && e.key.toLowerCase() === "d"){
+    state.user = { nombres:"Ana María", apellidos:"Ríos Bedoya", email:"ana.rios@correo.com", telefono:"3001234567", ciudad:"Medellín" };
+    state.skills = { "Python":5, "Django":3, "SQL":4, "Docker":3, "Git":5, "Scrum":3, "Linux":4 };
+    state.respuestas = { rol:["Backend"], seniority:"Semi-senior (2–5 años)", aprender:["Neo4j / Cypher","AWS"],
+      modalidad:"Híbrido", salario:"$6.000.000 – $9.000.000", disponibilidad:"En 15 días", prioridad:"Aprender y crecer" };
+    state.docs.cv = { nombre:"hoja_de_vida_ana_rios.pdf", kb:412 };
+    state.perfil = { nombre:"Ana María Ríos Bedoya", documento:"1017245896", tipodoc:"Cédula de ciudadanía",
+      tel:"3001234567", mail:"ana.rios@correo.com", dir:"Cra 43A # 5-15", ciudad:"Medellín, Antioquia" };
+    abrirApp();
+    toast("Modo demostración: perfil de Ana María cargado.");
+  }
+});
+</script>
+</body>
+</html>

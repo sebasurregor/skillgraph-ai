@@ -1,0 +1,20 @@
+# ---- Núcleo del proyecto -------------------------------------------------
+Django==5.0
+neo4j>=5.28,<6.0
+python-dotenv==1.0.1
+
+# ---- API REST y serialización -------------------------------------------
+djangorestframework==3.15.2
+
+# ---- Manejo de imágenes (heredado del código base: Room.image) -----------
+Pillow==10.4.0
+
+# ---- Calidad y pruebas ---------------------------------------------------
+pytest==8.3.3
+pytest-django==4.9.0
+coverage==7.6.1
+flake8==7.1.1
+
+# ---- Servidor de producción ---------------------------------------------
+gunicorn==23.0.0
+whitenoise==6.7.0
