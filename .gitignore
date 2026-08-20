@@ -1,34 +1,21 @@
-# Entornos virtuales
 venv/
 .venv/
 env/
-
-# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
-
-# Django
 db.sqlite3
 media_uploads/
 staticfiles/
 *.log
-
-# Variables de entorno — NUNCA subir credenciales reales
 .env
 !.env.example
-
-# Editores
 .vscode/
 .idea/
 *.swp
-
-# Windows / macOS
 Thumbs.db
 desktop.ini
 .DS_Store
-
-# Temporales de Office
 ~$*.docx
 ~$*.xlsx
 ~$*.pptx
