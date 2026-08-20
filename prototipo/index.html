@@ -1027,7 +1027,7 @@ const cop = n => "$" + n.toLocaleString("es-CO");
 function ir(id){
   $$("section").forEach(s => s.classList.add("hidden"));
   $(id).classList.remove("hidden");
-  window.scrollTo({top:0});
+  if(window.scrollTo) try { window.scrollTo({top:0}); } catch(_){}
 }
 let toastT;
 function toast(txt){
@@ -1062,7 +1062,7 @@ function validar(ids, contAlerta){
   if (primero){
     alerta(contAlerta, "error", MSG_OBLIG);
     primero.focus();
-    primero.scrollIntoView({block:"center", behavior:"smooth"});
+    if(primero.scrollIntoView) primero.scrollIntoView({block:"center", behavior:"smooth"});
     return false;
   }
   limpiarAlerta(contAlerta);
@@ -1074,9 +1074,10 @@ function validar(ids, contAlerta){
    ===================================================================== */
 (function red(){
   const c = $("#netcanvas"); if(!c) return;
-  const x = c.getContext("2d");
+  const x = c.getContext && c.getContext("2d"); if(!x) return;
   let W, H, pts = [];
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduce = typeof window.matchMedia === "function"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function size(){
     W = c.width = c.offsetWidth * devicePixelRatio;
     H = c.height = c.offsetHeight * devicePixelRatio;
@@ -1107,7 +1108,8 @@ function validar(ids, contAlerta){
     });
     requestAnimationFrame(draw);
   }
-  addEventListener("resize", size); size(); draw();
+  try { addEventListener("resize", size); size(); draw(); }
+  catch(err){ console.warn("Fondo decorativo desactivado:", err); }
 })();
 
 /* =====================================================================
@@ -1157,7 +1159,9 @@ $("#form-pw").addEventListener("submit", e => {
     el.value = ""; el.focus(); return;
   }
   const c = CUENTAS[state.email];
-  state.user = { nombres:c.nombres, apellidos:c.apellidos, email:state.email };
+  state.user = { nombres:c.nombres, apellidos:c.apellidos, email:state.email,
+                 telefono:c.telefono || "", ciudad:c.ciudad || "" };
+  limpiarAlerta("#pw-alert");
   entrarOnboarding();
 });
 
@@ -1186,11 +1190,23 @@ $("#form-signup").addEventListener("submit", e => {
   }
 
   state.email = $("#i-mail2").value.trim().toLowerCase();
-  state.user = { nombres:$("#i-nom").value.trim(), apellidos:$("#i-ape").value.trim(),
-                 email:state.email, telefono:$("#i-tel").value.trim(), ciudad:$("#i-ciudad").value };
-  CUENTAS[state.email] = { pw:$("#i-pw1").value, nombres:state.user.nombres, apellidos:state.user.apellidos };
-  toast("Cuenta creada. Bienvenido a SkillGraph AI.");
-  entrarOnboarding();
+  // La cuenta queda creada, pero el ingreso se hace desde la pantalla de inicio de
+  // sesión: así el usuario confirma que recuerda la contraseña que acaba de definir.
+  CUENTAS[state.email] = {
+    pw: $("#i-pw1").value,
+    nombres: $("#i-nom").value.trim(),
+    apellidos: $("#i-ape").value.trim(),
+    telefono: $("#i-tel").value.trim(),
+    ciudad: $("#i-ciudad").value
+  };
+  $("#form-signup").reset();
+  $("#pw-email-echo").textContent = state.email;
+  $("#i-pw").value = "";
+  alerta("#pw-alert", "ok",
+    "Su cuenta fue creada correctamente. Ingrese la contraseña que acaba de definir para continuar.");
+  ir("#s-password");
+  toast("Cuenta creada. Inicie sesión para continuar.");
+  setTimeout(() => $("#i-pw").focus(), 300);
 });
 
 function entrarOnboarding(){
@@ -1275,6 +1291,26 @@ function chipSkill(sk){
             aria-pressed="${state.skills[sk] !== undefined}">${sk}</button>`;
 }
 
+/** Selector de nivel 1-5 para cada habilidad declarada. */
+function pintarNiveles(){
+  const c = $("#skill-levels"); if(!c) return;
+  const ss = Object.keys(state.skills);
+  if(!ss.length){
+    c.innerHTML = `<p class="small muted">Marque al menos tres habilidades arriba para que podamos calcular su ajuste.</p>`;
+    return;
+  }
+  c.innerHTML = `<p class="lbl">Qué tan bien lo hace · 1 = lo básico, 5 = lo domino</p>` + ss.map(sk => `
+    <div class="skill-row">
+      <span class="nm">${sk}</span>
+      <div class="lvl">${[1,2,3,4,5].map(n =>
+        `<button type="button" data-s="${sk}" data-n="${n}" aria-pressed="${state.skills[sk]===n}">${n}</button>`).join("")}</div>
+    </div>`).join("");
+  $$("#skill-levels .lvl button").forEach(b => b.addEventListener("click", () => {
+    state.skills[b.dataset.s] = +b.dataset.n;
+    pintarNiveles(); dibujarGrafoVivo();
+  }));
+}
+
 /** Sugerencias de aprendizaje: habilidades del sector que todavía no declaró. */
 function pintarAprender(){
   const cont = $("#learn-picker"); if(!cont) return;
@@ -1346,7 +1382,8 @@ $("#quiz-next").addEventListener("click", () => {
   if(faltan.length){
     alerta("#quiz-alert","error", MSG_OBLIG + " Faltan " + faltan.length + " respuesta(s).");
     const i = PREGUNTAS.indexOf(faltan[0]);
-    $$("#quiz-body .q-block")[i].scrollIntoView({block:"center", behavior:"smooth"});
+    const bloque = $$("#quiz-body .q-block")[i];
+    if(bloque && bloque.scrollIntoView) bloque.scrollIntoView({block:"center", behavior:"smooth"});
     return;
   }
   if(Object.keys(state.skills).length < 3){
@@ -1408,7 +1445,8 @@ $("#form-profile").addEventListener("submit", e => {
   }
   if(!state.docs.cv){
     alerta("#prof-alert","error","Cargue su hoja de vida para continuar. Es obligatoria para postularse.");
-    $("[data-drop='cv']").scrollIntoView({block:"center", behavior:"smooth"});
+    const zona = $("[data-drop='cv']");
+    if(zona && zona.scrollIntoView) zona.scrollIntoView({block:"center", behavior:"smooth"});
     return;
   }
   ids.forEach(i => state.perfil[i.slice(3)] = $(i).value.trim());
@@ -1901,7 +1939,8 @@ function pintarAjustes(){
       </div>`;
     $("#logout").addEventListener("click", () => {
       state.user = null; state.guardadas.clear(); badge();
-      $("#i-email").value = ""; $("#i-pw").value = "";
+      state.query = ""; state.filtro = "todas"; state.skills = {}; state.respuestas = {};
+      $("#q").value = ""; $("#i-email").value = ""; $("#i-pw").value = "";
       limpiarAlerta("#email-alert");
       ir("#s-email");
       toast("Sesión cerrada.");
@@ -1951,6 +1990,8 @@ const DEMOS = {
   }
 };
 
+window.SkillGraph = { state, VACANTES, SECTORES, PREGUNTAS, calcular };  // inspección y pruebas
+
 addEventListener("keydown", e => {
   if(!e.altKey) return;
   const demo = DEMOS[e.key.toLowerCase()];
@@ -1961,6 +2002,9 @@ addEventListener("keydown", e => {
   state.docs = {...demo.docs};
   state.perfil = {...demo.perfil};
   state.guardadas.clear(); badge();
+  state.query = ""; state.filtro = "todas"; state.orden = "match";
+  if($("#q")) $("#q").value = "";
+  if($("#results-title")) $("#results-title").textContent = "Recomendadas para usted";
   abrirApp();
   toast(demo.aviso);
 });

@@ -1744,7 +1744,7 @@ Tipografía: **Space Grotesk** para títulos, cifras y etiquetas de nodo —su c
 |---|---|---|---|
 | 1 | Identificación por correo | `/users/login/` | Panel de marca con red de nodos animada; campo de correo; botones de Google, Apple y Microsoft |
 | 2 | Contraseña | `/users/login/password/` | Se muestra solo cuando el correo existe. Mensaje de credenciales inválidas sin revelar cuál dato falló |
-| 3 | Registro | `/users/signup/` | Se muestra cuando el correo **no** existe, con el correo prellenado. Nombres, apellidos, correo, teléfono, ciudad, contraseña y autorización de tratamiento de datos |
+| 3 | Registro | `/users/signup/` | Se muestra cuando el correo **no** existe, con el correo prellenado. Nombres, apellidos, correo, teléfono, ciudad, contraseña y autorización de tratamiento de datos. Al completarlo, el sistema crea la cuenta y devuelve al usuario a la pantalla de contraseña con un mensaje de confirmación, en lugar de iniciar sesión automáticamente |
 | 4 | Cuestionario inicial | `/onboarding/quiz/` | Diez preguntas adaptativas según el área ocupacional; panel lateral con el grafo en construcción |
 | 5 | Hoja de vida y documentos | `/onboarding/profile/` | Identificación, contacto, trayectoria y cuatro zonas de carga de archivos con arrastrar y soltar |
 | 6 | Buscar empleo | `/matching/recommendations/` | Barra de búsqueda, filtros rápidos, últimas búsquedas, tarjetas de vacante con anillo de ajuste y panel de explicabilidad desplegable |
@@ -1774,7 +1774,12 @@ Correo digitado
       │
       └─ ──No──▶  Pantalla de registro con el correo ya prellenado
                    y el aviso «No encontramos una cuenta con …»
+                            │
+                            └─ cuenta creada ──▶  Pantalla de contraseña
+                                                  «Su cuenta fue creada correctamente»
 ```
+
+La decisión de **no** iniciar sesión automáticamente tras el registro es deliberada: obliga al usuario a usar por primera vez la contraseña que acaba de definir, lo que reduce los bloqueos posteriores por olvido de credenciales y deja explícito el límite entre «crear la cuenta» y «entrar a la cuenta».
 
 Los tres proveedores de identidad federada —Google, Apple y Microsoft— están presentes en la interfaz y responden con un aviso que declara su estado real: la integración OAuth queda planificada para el Sprint 2 (HU-23). Presentar el botón sin implementarlo y sin decirlo sería engañoso; presentarlo declarando su estado permite validar la ubicación y la jerarquía visual desde ahora.
 
@@ -1884,5 +1889,16 @@ No requiere Python, ni Django, ni Neo4j, ni conexión a internet —salvo para d
    - Active el **modo oscuro** desde **Ajustes → Aplicación**.
 
 > **Atajos para la demostración.** `Alt + D` carga el perfil de Ana María Ríos (sector tecnología) y `Alt + N` el de Camilo Zapata (primer empleo, busca temporal de fin de año). Ambos saltan directamente a la pantalla de resultados sobre el mismo conjunto de vacantes, lo que permite mostrar en veinte segundos que el motor sirve a los dos extremos del mercado laboral.
+
+### A.5.1. Verificación automatizada del prototipo
+
+El prototipo se acompaña de una prueba de humo (`prototipo/test_flujo.js`) que recorre el flujo completo en un DOM simulado con jsdom y verifica **46 condiciones**: bifurcación del acceso según el correo, microcopia y comportamiento de la validación de formularios, creación de cuenta seguida de inicio de sesión, adaptación del catálogo de habilidades al sector elegido, bloqueo por preguntas sin responder, obligatoriedad de la hoja de vida, navegación del rail lateral, alternancia de modo oscuro, guardado con el corazón, despliegue del panel de explicabilidad, filtrado de la búsqueda con registro en el historial y los porcentajes esperados de los dos perfiles de demostración.
+
+```bash
+npm install jsdom
+node prototipo/test_flujo.js
+```
+
+La salida enumera cada condición y termina con el conteo. Esta prueba es el antecedente directo de la batería de `TestCase` de Django que exige la Definición de Terminado del Sprint 1.
 
 El estado vive en memoria: al recargar la página, la aplicación vuelve al inicio. Es una decisión deliberada del prototipo, ya que la persistencia corresponde a SQLite y a Neo4j en la implementación real.

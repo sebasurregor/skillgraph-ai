@@ -42,3 +42,12 @@ python manage.py check_graph
 ## Stack
 
 Django 5.0 · Python 3.12 · SQLite3 · Neo4j 5.x (Bolt) · HTML/CSS/JS
+
+## Probar el prototipo automáticamente
+
+```bash
+npm install jsdom
+node prototipo/test_flujo.js
+```
+
+Recorre el flujo completo y verifica 46 condiciones.
