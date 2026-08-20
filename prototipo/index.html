@@ -519,13 +519,13 @@ a{color:var(--navy-2)}
     <p class="eyebrow">Cuestionario inicial</p>
     <h1 style="font-size:30px;margin:6px 0 8px">Cuéntenos qué está buscando</h1>
     <p class="muted" style="max-width:56ch">Cada respuesta agrega un nodo a su grafo y cambia lo que le vamos a recomendar.
-      Son ocho preguntas y toma menos de dos minutos.</p>
+      Son diez preguntas y toma menos de tres minutos.</p>
 
     <div id="quiz-alert" class="hidden" style="margin-top:20px"></div>
     <div id="quiz-body" style="margin-top:10px"></div>
 
     <div class="row between center" style="margin-top:30px;padding-top:22px;border-top:1px solid var(--line)">
-      <span class="small muted" id="quiz-count">0 de 8 preguntas respondidas</span>
+      <span class="small muted" id="quiz-count">0 de 10 preguntas respondidas</span>
       <button class="btn btn-primary" id="quiz-next">Continuar a mis datos →</button>
     </div>
   </div>
@@ -746,7 +746,7 @@ a{color:var(--navy-2)}
       <div class="searchbar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round">
           <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-        <input id="q" type="search" placeholder="Cargo, empresa o habilidad — por ejemplo: backend Django">
+        <input id="q" type="search" placeholder="Cargo, empresa o habilidad — por ejemplo: auxiliar de bodega, mesero, contable">
         <button class="btn btn-primary" id="btn-search">Buscar</button>
       </div>
 
@@ -818,69 +818,203 @@ const CUENTAS = { "ana.rios@correo.com": { pw: "skillgraph2026", nombres: "Ana M
 const state = {
   email: "", user: null, respuestas: {}, skills: {},
   perfil: {}, docs: {}, guardadas: new Set(),
-  recientes: ["backend django", "neo4j medellín", "remoto senior"],
+  recientes: ["auxiliar de bodega", "temporal navidad", "medio tiempo"],
   tema: "light", tab: "search", stab: "perfil", filtro: "todas", orden: "match", query: ""
 };
 
-/* ---------------- catálogo de habilidades y vacantes ---------------- */
-const CATALOGO = ["Python","Django","JavaScript","TypeScript","React","Node.js","Java","Spring Boot",
-  "SQL","PostgreSQL","Neo4j / Cypher","Docker","Kubernetes","AWS","Git","Linux","Pandas",
-  "Power BI","Figma","Scrum","Pruebas automatizadas","Ciberseguridad"];
+/* ---------------- catálogo ocupacional: 16 sectores del mercado laboral ---------------- */
+const SECTORES = {
+  "Tecnología e informática": ["Python","Java","JavaScript","React","SQL","Django","Docker","Git","Linux",
+    "Neo4j / Cypher","AWS","Pandas","Power BI","Soporte técnico","Redes","Ciberseguridad","Scrum"],
+  "Ventas y comercio": ["Atención al cliente","Cierre de ventas","Manejo de caja","Inventarios",
+    "Visual merchandising","Ventas por WhatsApp","Facturación electrónica","Asesoría de producto"],
+  "Servicio al cliente y call center": ["Atención telefónica","Manejo de CRM","Manejo de quejas",
+    "Retención de clientes","Digitación rápida","Inglés conversacional"],
+  "Logística y bodega": ["Manejo de inventarios","Picking y packing","Recepción de mercancía",
+    "Montacargas","WMS / SAP","Alistamiento de pedidos","Carga y descarga"],
+  "Alimentos y restaurantes": ["Manipulación de alimentos","Servicio a la mesa","Cocina caliente",
+    "Barismo","Caja y facturación","Panadería y repostería","Manejo de domicilios"],
+  "Salud y cuidado": ["Auxiliar de enfermería","Toma de signos vitales","Primeros auxilios","Bioseguridad",
+    "Historia clínica","Cuidado de adulto mayor","Cuidado infantil"],
+  "Educación": ["Planeación de clases","Manejo de grupo","Evaluación por competencias",
+    "Plataformas virtuales","Refuerzo escolar","Primera infancia"],
+  "Administración y finanzas": ["Excel","Contabilidad básica","Facturación electrónica","Nómina",
+    "Siigo / World Office","Archivo y documentación","Atención a proveedores","Cartera y cobranza"],
+  "Construcción y oficios": ["Electricidad","Plomería","Soldadura","Trabajo en alturas","Lectura de planos",
+    "Pintura y acabados","Manejo de herramienta","Obra blanca"],
+  "Belleza y estética": ["Corte de cabello","Colorimetría","Manicure y pedicure","Maquillaje","Depilación",
+    "Tratamientos capilares"],
+  "Transporte y conducción": ["Conducción de moto","Licencia B1","Licencia C1","Manejo de rutas",
+    "Entrega de domicilios","Mecánica básica"],
+  "Seguridad y vigilancia": ["Curso de vigilancia","Control de acceso","Manejo de CCTV",
+    "Reporte de novedades","Primeros auxilios"],
+  "Aseo y mantenimiento": ["Aseo de áreas","Manejo de químicos","Mantenimiento locativo","Jardinería",
+    "Lavandería"],
+  "Turismo y hotelería": ["Recepción de huéspedes","Reservas","Camarería","Inglés conversacional",
+    "Guianza turística","Manejo de eventos"],
+  "Marketing y diseño": ["Redes sociales","Creación de contenido","Diseño gráfico","Community management",
+    "Fotografía","Figma","Edición de video"],
+  "Agro y producción": ["Operación de maquinaria","Control de calidad","Empaque y etiquetado",
+    "Buenas prácticas agrícolas","Manejo de cultivos","Manejo de línea de producción"]
+};
 
+/* Habilidades que sirven en cualquier sector: siempre están disponibles */
+const TRANSVERSALES = ["Trabajo en equipo","Puntualidad","Comunicación","Atención al cliente",
+  "Excel","Manejo de computador","Resolución de problemas","Liderazgo"];
+
+/** Devuelve las habilidades ofrecidas según los sectores que el usuario eligió. */
+function skillsDisponibles(){
+  const elegidos = state.respuestas.sector || [];
+  const set = new Set(TRANSVERSALES);
+  elegidos.forEach(sec => (SECTORES[sec] || []).forEach(sk => set.add(sk)));
+  Object.keys(state.skills).forEach(sk => set.add(sk));   // conserva lo ya declarado
+  return [...set];
+}
+
+/* ---------------- vacantes de demostración: 16 cargos de distintos sectores ---------------- */
 const VACANTES = [
-  { id:128, titulo:"Desarrollador Backend Senior", empresa:"TechNova S.A.S.", sigla:"TN", ciudad:"Medellín",
-    modalidad:"Híbrido", salario:9500000, dias:3, rol:"Backend Engineer", centralidad:0.91,
+  { id:201, titulo:"Auxiliar de bodega — temporada navideña", empresa:"Logística Express S.A.S.", sigla:"LE",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Temporal", salario:1600000, dias:1,
+    rol:"Auxiliar logístico", sector:"Logística y bodega", centralidad:0.74,
+    req:[["Manejo de inventarios",.28,2],["Picking y packing",.25,2],["Trabajo en equipo",.20,3],
+         ["Recepción de mercancía",.17,2],["Puntualidad",.10,3]] },
+
+  { id:205, titulo:"Asesor comercial de tienda", empresa:"Moda Andina", sigla:"MA",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Tiempo completo", salario:1900000, dias:3,
+    rol:"Asesor comercial", sector:"Ventas y comercio", centralidad:0.86,
+    req:[["Atención al cliente",.30,3],["Cierre de ventas",.25,3],["Manejo de caja",.20,2],
+         ["Inventarios",.15,2],["Comunicación",.10,3]] },
+
+  { id:212, titulo:"Mesero para fines de semana", empresa:"Restaurante La Provincia", sigla:"LP",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Por turnos", salario:1500000, dias:2,
+    rol:"Mesero", sector:"Alimentos y restaurantes", centralidad:0.69,
+    req:[["Servicio a la mesa",.30,2],["Manipulación de alimentos",.25,2],["Atención al cliente",.25,3],
+         ["Caja y facturación",.12,2],["Trabajo en equipo",.08,3]] },
+
+  { id:218, titulo:"Agente de call center bilingüe", empresa:"ConectaBPO", sigla:"CB",
+    ciudad:"Bogotá", modalidad:"Híbrido", jornada:"Tiempo completo", salario:2600000, dias:4,
+    rol:"Agente de servicio", sector:"Servicio al cliente y call center", centralidad:0.81,
+    req:[["Inglés conversacional",.32,3],["Atención telefónica",.25,3],["Manejo de CRM",.18,2],
+         ["Manejo de quejas",.15,2],["Digitación rápida",.10,3]] },
+
+  { id:224, titulo:"Auxiliar de enfermería", empresa:"Clínica San Rafael", sigla:"CS",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Por turnos", salario:2300000, dias:5,
+    rol:"Auxiliar de enfermería", sector:"Salud y cuidado", centralidad:0.77,
+    req:[["Auxiliar de enfermería",.30,4],["Toma de signos vitales",.25,3],["Bioseguridad",.20,3],
+         ["Primeros auxilios",.15,3],["Historia clínica",.10,2]] },
+
+  { id:231, titulo:"Auxiliar contable", empresa:"Grupo Sartor", sigla:"GS",
+    ciudad:"Bogotá", modalidad:"Híbrido", jornada:"Tiempo completo", salario:2700000, dias:6,
+    rol:"Auxiliar contable", sector:"Administración y finanzas", centralidad:0.83,
+    req:[["Contabilidad básica",.30,3],["Excel",.25,3],["Facturación electrónica",.20,2],
+         ["Siigo / World Office",.15,2],["Archivo y documentación",.10,2]] },
+
+  { id:237, titulo:"Docente de primaria", empresa:"Colegio La Alborada", sigla:"CA",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Tiempo completo", salario:2900000, dias:8,
+    rol:"Docente", sector:"Educación", centralidad:0.70,
+    req:[["Planeación de clases",.30,3],["Manejo de grupo",.28,3],["Evaluación por competencias",.20,2],
+         ["Plataformas virtuales",.12,2],["Comunicación",.10,3]] },
+
+  { id:243, titulo:"Domiciliario en moto", empresa:"RápidoYa", sigla:"RY",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Por horas", salario:1700000, dias:1,
+    rol:"Domiciliario", sector:"Transporte y conducción", centralidad:0.64,
+    req:[["Conducción de moto",.35,3],["Entrega de domicilios",.25,2],["Manejo de rutas",.20,2],
+         ["Puntualidad",.20,4]] },
+
+  { id:249, titulo:"Estilista profesional", empresa:"Studio Bruna", sigla:"SB",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Tiempo completo", salario:2000000, dias:9,
+    rol:"Estilista", sector:"Belleza y estética", centralidad:0.58,
+    req:[["Corte de cabello",.32,4],["Colorimetría",.25,3],["Atención al cliente",.20,3],
+         ["Manicure y pedicure",.13,2],["Maquillaje",.10,2]] },
+
+  { id:255, titulo:"Guarda de seguridad", empresa:"Vigilancia Antioquia", sigla:"VA",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Por turnos", salario:1800000, dias:7,
+    rol:"Guarda de seguridad", sector:"Seguridad y vigilancia", centralidad:0.66,
+    req:[["Curso de vigilancia",.35,3],["Control de acceso",.25,2],["Manejo de CCTV",.20,2],
+         ["Reporte de novedades",.12,2],["Puntualidad",.08,4]] },
+
+  { id:261, titulo:"Recepcionista de hotel", empresa:"Hotel Poblado Real", sigla:"HP",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Por turnos", salario:2100000, dias:4,
+    rol:"Recepcionista", sector:"Turismo y hotelería", centralidad:0.72,
+    req:[["Recepción de huéspedes",.28,3],["Reservas",.24,2],["Inglés conversacional",.23,3],
+         ["Atención al cliente",.15,3],["Excel",.10,2]] },
+
+  { id:268, titulo:"Community manager", empresa:"Estudio Cardinal", sigla:"EC",
+    ciudad:"Remoto", modalidad:"Remoto", jornada:"Medio tiempo", salario:2400000, dias:2,
+    rol:"Community manager", sector:"Marketing y diseño", centralidad:0.75,
+    req:[["Redes sociales",.30,3],["Creación de contenido",.25,3],["Diseño gráfico",.20,2],
+         ["Fotografía",.15,2],["Community management",.10,3]] },
+
+  { id:274, titulo:"Electricista de obra", empresa:"Construcciones Vélez", sigla:"CV",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Tiempo completo", salario:3100000, dias:6,
+    rol:"Oficial eléctrico", sector:"Construcción y oficios", centralidad:0.68,
+    req:[["Electricidad",.32,4],["Trabajo en alturas",.26,3],["Lectura de planos",.20,3],
+         ["Manejo de herramienta",.12,3],["Trabajo en equipo",.10,3]] },
+
+  { id:280, titulo:"Auxiliar de aseo y mantenimiento", empresa:"Servicios Integrales", sigla:"SI",
+    ciudad:"Medellín", modalidad:"Presencial", jornada:"Medio tiempo", salario:1450000, dias:3,
+    rol:"Auxiliar de servicios generales", sector:"Aseo y mantenimiento", centralidad:0.55,
+    req:[["Aseo de áreas",.35,2],["Manejo de químicos",.25,2],["Mantenimiento locativo",.20,2],
+         ["Puntualidad",.20,4]] },
+
+  { id:128, titulo:"Desarrollador Backend Senior", empresa:"TechNova S.A.S.", sigla:"TN",
+    ciudad:"Medellín", modalidad:"Híbrido", jornada:"Tiempo completo", salario:9500000, dias:3,
+    rol:"Backend Engineer", sector:"Tecnología e informática", centralidad:0.91,
     req:[["Python",.30,4],["Django",.25,4],["Neo4j / Cypher",.25,3],["Docker",.12,2],["Scrum",.08,2]] },
-  { id:131, titulo:"Ingeniera de Datos", empresa:"Andes Analytics", sigla:"AA", ciudad:"Bogotá",
-    modalidad:"Remoto", salario:8800000, dias:1, rol:"Data Engineer", centralidad:0.84,
-    req:[["Python",.28,4],["SQL",.24,4],["Pandas",.20,3],["AWS",.16,3],["Docker",.12,2]] },
-  { id:142, titulo:"Desarrollador Full Stack", empresa:"Kúmara Digital", sigla:"KD", ciudad:"Medellín",
-    modalidad:"Presencial", salario:7200000, dias:6, rol:"Full Stack Engineer", centralidad:0.88,
-    req:[["JavaScript",.25,4],["React",.25,4],["Node.js",.20,3],["SQL",.18,3],["Git",.12,3]] },
-  { id:155, titulo:"Analista de Pruebas Automatizadas", empresa:"Quantum QA", sigla:"QQ", ciudad:"Cali",
-    modalidad:"Remoto", salario:6100000, dias:9, rol:"QA Engineer", centralidad:0.72,
-    req:[["Pruebas automatizadas",.35,4],["Python",.25,3],["Git",.20,3],["SQL",.20,2]] },
-  { id:161, titulo:"Ingeniero DevOps", empresa:"Nubex Cloud", sigla:"NC", ciudad:"Remoto",
-    modalidad:"Remoto", salario:11200000, dias:2, rol:"DevOps Engineer", centralidad:0.79,
-    req:[["Docker",.28,4],["Kubernetes",.26,4],["AWS",.24,4],["Linux",.14,3],["Git",.08,3]] },
-  { id:167, titulo:"Desarrollador Backend Junior", empresa:"Semilla Tech", sigla:"ST", ciudad:"Medellín",
-    modalidad:"Híbrido", salario:3900000, dias:4, rol:"Backend Engineer", centralidad:0.91,
-    req:[["Python",.35,2],["SQL",.25,2],["Git",.22,2],["Django",.18,2]] },
-  { id:172, titulo:"Diseñadora de Producto", empresa:"Vera Studio", sigla:"VS", ciudad:"Bogotá",
-    modalidad:"Híbrido", salario:6800000, dias:11, rol:"Product Designer", centralidad:0.61,
-    req:[["Figma",.45,4],["Scrum",.20,3],["JavaScript",.20,2],["Git",.15,2]] },
-  { id:180, titulo:"Analista de Ciberseguridad", empresa:"Fortia Seguridad", sigla:"FS", ciudad:"Bogotá",
-    modalidad:"Presencial", salario:8100000, dias:7, rol:"Security Analyst", centralidad:0.68,
-    req:[["Ciberseguridad",.40,4],["Linux",.25,3],["Python",.20,3],["AWS",.15,2]] }
+
+  { id:131, titulo:"Ingeniera de datos", empresa:"Andes Analytics", sigla:"AA",
+    ciudad:"Bogotá", modalidad:"Remoto", jornada:"Tiempo completo", salario:8800000, dias:1,
+    rol:"Data Engineer", sector:"Tecnología e informática", centralidad:0.84,
+    req:[["Python",.28,4],["SQL",.24,4],["Pandas",.20,3],["AWS",.16,3],["Docker",.12,2]] }
 ];
 
 const PESOS = { cobertura:0.60, nivel:0.25, centralidad:0.10, adyacencia:0.05, version:"1.0.0" };
 
-/* ---------------- preguntas del cuestionario ---------------- */
+/* ---------------- cuestionario: diez preguntas válidas para cualquier oficio ---------------- */
 const PREGUNTAS = [
-  { id:"rol", tipo:"multi", titulo:"¿Qué tipo de rol está buscando?",
-    ayuda:"Define contra qué nodos :Rol comparamos su perfil. Puede elegir varios.",
-    opciones:["Backend","Frontend","Full Stack","Datos e IA","DevOps / Nube","QA y pruebas","Diseño de producto","Ciberseguridad"] },
-  { id:"seniority", tipo:"single", titulo:"¿En qué nivel se ubica hoy?",
-    ayuda:"Lo usamos para comparar su nivel declarado contra el mínimo que exige cada vacante.",
-    opciones:["Practicante","Junior (0–2 años)","Semi-senior (2–5 años)","Senior (5–8 años)","Líder técnico (8+ años)"] },
-  { id:"skills", tipo:"skills", titulo:"¿Qué habilidades domina y en qué nivel?",
-    ayuda:"Esta es la pregunta que más pesa: cada habilidad se vuelve una arista :HAS_SKILL con su nivel de 1 a 5." },
-  { id:"aprender", tipo:"multi", titulo:"¿Qué está dispuesto a aprender en los próximos seis meses?",
-    ayuda:"Nos permite recomendarle vacantes que hoy no cubre pero que puede alcanzar cerrando una brecha corta.",
-    opciones:["Neo4j / Cypher","Kubernetes","AWS","TypeScript","Ciberseguridad","Pandas","Nada por ahora"] },
-  { id:"modalidad", tipo:"single", titulo:"¿Qué modalidad de trabajo necesita?",
+  { id:"sector", tipo:"multi", titulo:"¿En qué áreas está buscando trabajo?",
+    ayuda:"Define contra qué nodos :Rol comparamos su perfil y qué habilidades le mostramos en la pregunta 3. Puede elegir varias.",
+    opciones:Object.keys(SECTORES) },
+
+  { id:"experiencia", tipo:"single", titulo:"¿Cuánta experiencia tiene en esa área?",
+    ayuda:"La usamos para comparar su nivel contra el mínimo que pide cada vacante. No tener experiencia no lo descalifica: hay vacantes que no la exigen.",
+    opciones:["Es mi primer empleo","Menos de 1 año","Entre 1 y 3 años","Entre 3 y 6 años",
+              "Más de 6 años","Tengo experiencia dirigiendo equipos"] },
+
+  { id:"skills", tipo:"skills", titulo:"¿Qué sabe hacer y qué tan bien lo hace?",
+    ayuda:"Esta es la pregunta que más pesa: cada habilidad se vuelve una arista :HAS_SKILL con su nivel de 1 a 5. Las primeras ocho sirven en cualquier oficio; el resto aparece según las áreas que eligió." },
+
+  { id:"aprender", tipo:"aprender", titulo:"¿Qué estaría dispuesto a aprender o certificar?",
+    ayuda:"Nos permite recomendarle vacantes que hoy no cubre del todo, pero que puede alcanzar con un curso corto." },
+
+  { id:"jornada", tipo:"multi", titulo:"¿Qué tipo de jornada le sirve?",
+    ayuda:"Puede marcar varias. Si busca algo temporal o por horas, márquelo aquí para que no le mostremos solo cargos de tiempo completo.",
+    opciones:["Tiempo completo","Medio tiempo","Por turnos","Temporal o por temporada",
+              "Por horas","Prácticas o contrato de aprendizaje"] },
+
+  { id:"modalidad", tipo:"single", titulo:"¿Dónde necesita trabajar?",
     ayuda:"Filtro duro: descartamos las vacantes que no cumplan esta condición.",
-    opciones:["Remoto","Híbrido","Presencial","Me da igual"] },
-  { id:"salario", tipo:"single", titulo:"¿Cuál es su expectativa salarial mensual?",
+    opciones:["Presencial","Híbrido","Remoto","Me da igual"] },
+
+  { id:"salario", tipo:"single", titulo:"¿Cuál es su aspiración salarial mensual?",
     ayuda:"No se la mostramos al contratante. Solo la usamos para ordenar mejor sus resultados.",
-    opciones:["Hasta $3.000.000","$3.000.000 – $6.000.000","$6.000.000 – $9.000.000","$9.000.000 – $13.000.000","Más de $13.000.000"] },
+    opciones:["Hasta $1.500.000","$1.500.000 – $2.500.000","$2.500.000 – $4.000.000",
+              "$4.000.000 – $7.000.000","Más de $7.000.000"] },
+
   { id:"disponibilidad", tipo:"single", titulo:"¿Cuándo podría empezar?",
     ayuda:"Los contratantes con vacantes urgentes filtran por este campo.",
     opciones:["Inmediatamente","En 15 días","En 30 días","Solo estoy explorando"] },
+
+  { id:"requisitos", tipo:"multi", titulo:"¿Cuál de estos requisitos ya cumple?",
+    ayuda:"Muchas vacantes se pierden por un documento o un curso, no por falta de capacidad. Marcar lo que ya tiene le abre esas vacantes.",
+    opciones:["Licencia de conducción","Moto o vehículo propio","Libreta militar",
+              "Curso de manipulación de alimentos","Certificado de trabajo en alturas",
+              "Curso de vigilancia vigente","Disponibilidad para viajar","Ninguno por ahora"] },
+
   { id:"prioridad", tipo:"single", titulo:"Si tuviera que elegir una sola cosa, ¿qué le importa más?",
     ayuda:"Desempata vacantes con ajuste parecido.",
-    opciones:["Salario","Aprender y crecer","Estabilidad","Balance con mi vida","Impacto del producto"] }
+    opciones:["El salario","La estabilidad","El horario y el tiempo libre","Aprender y crecer",
+              "Que quede cerca de mi casa","Un buen ambiente de trabajo"] }
 ];
 
 /* =====================================================================
@@ -1073,11 +1207,9 @@ function pintarCuestionario(){
   cont.innerHTML = PREGUNTAS.map((p, i) => {
     let cuerpo;
     if(p.tipo === "skills"){
-      cuerpo = `
-        <div class="row wrap" id="skill-picker">
-          ${CATALOGO.map(s => `<button type="button" class="chip" data-skill="${s}" aria-pressed="false">${s}</button>`).join("")}
-        </div>
-        <div id="skill-levels" style="margin-top:16px"></div>`;
+      cuerpo = `<div id="skill-picker" class="row wrap"></div><div id="skill-levels" style="margin-top:16px"></div>`;
+    } else if(p.tipo === "aprender"){
+      cuerpo = `<div id="learn-picker" class="row wrap"></div>`;
     } else {
       cuerpo = `<div class="opt-grid">${p.opciones.map(o => `
         <button type="button" class="opt" data-q="${p.id}" data-tipo="${p.tipo}" data-v="${o}" aria-pressed="false">
@@ -1085,7 +1217,7 @@ function pintarCuestionario(){
           <span>${o}</span></button>`).join("")}</div>`;
     }
     return `<div class="q-block">
-      <p class="q-num">PREGUNTA ${String(i+1).padStart(2,"0")}${p.tipo==="multi"?" · varias opciones":""}</p>
+      <p class="q-num">PREGUNTA ${String(i+1).padStart(2,"0")}${p.tipo==="multi"||p.tipo==="aprender"?" · varias opciones":""}</p>
       <h3 class="q-title">${p.titulo}</h3>
       <p class="q-help">${p.ayuda}</p>
       ${cuerpo}
@@ -1106,30 +1238,66 @@ function pintarCuestionario(){
       state.respuestas[q] = [...set];
       if(!state.respuestas[q].length) delete state.respuestas[q];
     }
+    // cambiar de sector redefine las habilidades que se ofrecen
+    if(q === "sector"){ pintarSkills(); pintarAprender(); }
     actualizarQuiz();
   }));
 
-  $$("#skill-picker .chip").forEach(b => b.addEventListener("click", () => {
-    const s = b.dataset.skill;
-    if(state.skills[s] !== undefined){ delete state.skills[s]; b.setAttribute("aria-pressed","false"); }
-    else { state.skills[s] = 3; b.setAttribute("aria-pressed","true"); }
-    pintarNiveles(); actualizarQuiz();
-  }));
+  pintarSkills(); pintarAprender();
 }
 
-function pintarNiveles(){
-  const c = $("#skill-levels"); if(!c) return;
-  const ss = Object.keys(state.skills);
-  if(!ss.length){ c.innerHTML = `<p class="small muted">Seleccione al menos tres habilidades para que el motor pueda calcular su ajuste.</p>`; return; }
-  c.innerHTML = `<p class="lbl">Nivel de dominio · 1 = básico, 5 = experto</p>` + ss.map(s => `
-    <div class="skill-row">
-      <span class="nm">${s}</span>
-      <div class="lvl">${[1,2,3,4,5].map(n =>
-        `<button type="button" data-s="${s}" data-n="${n}" aria-pressed="${state.skills[s]===n}">${n}</button>`).join("")}</div>
-    </div>`).join("");
-  $$("#skill-levels .lvl button").forEach(b => b.addEventListener("click", () => {
-    state.skills[b.dataset.s] = +b.dataset.n;
-    pintarNiveles(); dibujarGrafoVivo();
+/** Habilidades ofrecidas: transversales + las de los sectores elegidos. */
+function pintarSkills(){
+  const cont = $("#skill-picker"); if(!cont) return;
+  const sectores = state.respuestas.sector || [];
+  const propias = skillsDisponibles().filter(sk => !TRANSVERSALES.includes(sk));
+
+  cont.innerHTML =
+    `<p class="lbl" style="width:100%;margin-bottom:2px">Sirven en cualquier oficio</p>` +
+    TRANSVERSALES.map(sk => chipSkill(sk)).join("") +
+    (sectores.length
+      ? `<p class="lbl" style="width:100%;margin:14px 0 2px">Propias de ${sectores.join(" · ")}</p>` +
+        propias.map(sk => chipSkill(sk)).join("")
+      : `<p class="small muted" style="width:100%;margin-top:14px">
+           Elija al menos un área en la pregunta 1 y aquí aparecerán las habilidades propias de ese oficio.</p>`);
+
+  $$("#skill-picker .chip").forEach(b => b.addEventListener("click", () => {
+    const sk = b.dataset.skill;
+    if(state.skills[sk] !== undefined) delete state.skills[sk];
+    else state.skills[sk] = 3;
+    pintarSkills(); pintarNiveles(); pintarAprender(); actualizarQuiz();
+  }));
+  pintarNiveles();
+}
+
+function chipSkill(sk){
+  return `<button type="button" class="chip" data-skill="${sk}"
+            aria-pressed="${state.skills[sk] !== undefined}">${sk}</button>`;
+}
+
+/** Sugerencias de aprendizaje: habilidades del sector que todavía no declaró. */
+function pintarAprender(){
+  const cont = $("#learn-picker"); if(!cont) return;
+  const candidatas = skillsDisponibles().filter(sk => state.skills[sk] === undefined).slice(0, 12);
+  const marcadas = new Set(state.respuestas.aprender || []);
+
+  if(!candidatas.length){
+    cont.innerHTML = `<p class="small muted">Ya declaró todas las habilidades de las áreas que eligió.
+      Marque «Nada por ahora» para continuar.</p>`;
+  } else {
+    cont.innerHTML = candidatas.map(sk =>
+      `<button type="button" class="chip" data-learn="${sk}" aria-pressed="${marcadas.has(sk)}">${sk}</button>`).join("");
+  }
+  cont.innerHTML += `<button type="button" class="chip" data-learn="Nada por ahora"
+                       aria-pressed="${marcadas.has("Nada por ahora")}">Nada por ahora</button>`;
+
+  $$("#learn-picker .chip").forEach(b => b.addEventListener("click", () => {
+    const v = b.dataset.learn;
+    const set = new Set(state.respuestas.aprender || []);
+    set.has(v) ? set.delete(v) : set.add(v);
+    state.respuestas.aprender = [...set];
+    if(!state.respuestas.aprender.length) delete state.respuestas.aprender;
+    pintarAprender(); actualizarQuiz();
   }));
 }
 
@@ -1137,6 +1305,7 @@ function actualizarQuiz(){
   const n = PREGUNTAS.filter(p => p.tipo === "skills"
       ? Object.keys(state.skills).length > 0
       : state.respuestas[p.id] !== undefined).length;
+  $("#quiz-count").dataset.total = PREGUNTAS.length;
   $("#quiz-count").textContent = `${n} de ${PREGUNTAS.length} preguntas respondidas`;
   dibujarGrafoVivo();
 }
@@ -1144,11 +1313,12 @@ function actualizarQuiz(){
 function dibujarGrafoVivo(){
   const svg = $("#live-graph"); if(!svg) return;
   const nodos = [];
-  (state.respuestas.rol || []).forEach(v => nodos.push({t:v, c:"#67C2EC"}));
+  (state.respuestas.sector || []).forEach(v => nodos.push({t:v.split(" ")[0], c:"#67C2EC"}));
   Object.keys(state.skills).forEach(s => nodos.push({t:s, c:"#06D261"}));
   if(state.respuestas.modalidad) nodos.push({t:state.respuestas.modalidad, c:"#FFFFFF"});
-  if(state.respuestas.seniority) nodos.push({t:state.respuestas.seniority.split(" ")[0], c:"#FFFFFF"});
-  (state.respuestas.aprender || []).filter(v=>v!=="Nada por ahora").forEach(v => nodos.push({t:v, c:"#C77B18"}));
+  (state.respuestas.jornada || []).forEach(v => nodos.push({t:v, c:"#FFFFFF"}));
+  (state.respuestas.aprender || []).filter(v => v !== "Nada por ahora")
+      .forEach(v => nodos.push({t:v, c:"#C77B18"}));
 
   const cx = 160, cy = 170, vis = nodos.slice(0, 16);
   let html = "";
@@ -1197,9 +1367,10 @@ function prellenarPerfil(){
   $("#p-mail").value = u.email || "";
   $("#p-tel").value = u.telefono || "";
   $("#p-ciudad").value = u.ciudad ? u.ciudad + ", Colombia" : "";
-  const sen = state.respuestas.seniority || "";
-  const m = sen.match(/(\d+)/);
+  const exp = state.respuestas.experiencia || "";
+  const m = exp.match(/(\d+)/);
   if(m) $("#p-anios").value = m[1];
+  else if(exp.includes("primer empleo")) $("#p-anios").value = "0";
 }
 
 $$("[data-drop]").forEach(z => {
@@ -1314,7 +1485,7 @@ $$(".rail-btn").forEach(b => b.addEventListener("click", () => {
   window.scrollTo({top:0});
 }));
 
-const FILTROS = ["todas","Remoto","Híbrido","Presencial","Medellín","Bogotá","Sin brechas"];
+const FILTROS = ["todas","Presencial","Remoto","Temporal","Medio tiempo","Por turnos","Sin brechas"];
 function pintarFiltros(){
   $("#filters").innerHTML = FILTROS.map(f =>
     `<button class="chip" data-f="${f}" aria-pressed="${state.filtro===f}">${f==="todas"?"Todas":f}</button>`).join("");
@@ -1367,7 +1538,9 @@ function filtrar(){
   }
   if(state.filtro !== "todas"){
     if(state.filtro === "Sin brechas") lista = lista.filter(({m}) => m.faltantes.length === 0);
-    else lista = lista.filter(({v}) => v.modalidad === state.filtro || v.ciudad === state.filtro);
+    else lista = lista.filter(({v}) =>
+      v.modalidad === state.filtro || v.ciudad === state.filtro ||
+      v.jornada === state.filtro || v.jornada.startsWith(state.filtro));
   }
   const ord = { match:(a,b)=>b.m.pct-a.m.pct, salary:(a,b)=>b.v.salario-a.v.salario, recent:(a,b)=>a.v.dias-b.v.dias };
   return lista.sort(ord[state.orden]);
@@ -1383,7 +1556,7 @@ function tarjeta(v, m, idx){
       <span class="logo-sq">${v.sigla}</span>
       <div class="grow">
         <h3>${v.titulo}</h3>
-        <p class="meta">${v.empresa} · ${v.ciudad} · ${v.modalidad} · ${cop(v.salario)} · hace ${v.dias} d</p>
+        <p class="meta">${v.empresa} · ${v.ciudad} · ${v.modalidad} · ${v.jornada} · ${cop(v.salario)} · hace ${v.dias} d</p>
         <div class="tags">
           ${m.cubiertas.map(c=>`<span class="tag tag-ok">${c.nombre} ✓</span>`).join("")}
           ${m.faltantes.map(f=>`<span class="tag tag-miss">${f.nombre} · falta</span>`).join("")}
@@ -1583,7 +1756,7 @@ function pintarAjustes(){
             </div>`).join("")}
         </div>
         <div class="row wrap" style="margin-top:18px">
-          ${CATALOGO.filter(s => state.skills[s] === undefined).map(s =>
+          ${skillsDisponibles().filter(s => state.skills[s] === undefined).map(s =>
             `<button class="chip" data-add="${s}">+ ${s}</button>`).join("")}
         </div>
       </div>
@@ -1615,8 +1788,7 @@ function pintarAjustes(){
         const vals = Array.isArray(v) ? v : [v];
         vals.forEach(val => { const b = $(`#quiz-body .opt[data-q="${q}"][data-v="${val}"]`); if(b) b.setAttribute("aria-pressed","true"); });
       });
-      Object.keys(state.skills).forEach(s => { const b = $(`#skill-picker .chip[data-skill="${s}"]`); if(b) b.setAttribute("aria-pressed","true"); });
-      pintarNiveles(); actualizarQuiz(); ir("#s-quiz");
+      pintarSkills(); pintarAprender(); actualizarQuiz(); ir("#s-quiz");
     });
   }
 
@@ -1745,19 +1917,52 @@ function alternar(b){
   b.setAttribute("aria-checked", String(on));
 }
 
-/* atajo de demostración: Alt + D salta directo a la aplicación con datos cargados */
-addEventListener("keydown", e => {
-  if(e.altKey && e.key.toLowerCase() === "d"){
-    state.user = { nombres:"Ana María", apellidos:"Ríos Bedoya", email:"ana.rios@correo.com", telefono:"3001234567", ciudad:"Medellín" };
-    state.skills = { "Python":5, "Django":3, "SQL":4, "Docker":3, "Git":5, "Scrum":3, "Linux":4 };
-    state.respuestas = { rol:["Backend"], seniority:"Semi-senior (2–5 años)", aprender:["Neo4j / Cypher","AWS"],
-      modalidad:"Híbrido", salario:"$6.000.000 – $9.000.000", disponibilidad:"En 15 días", prioridad:"Aprender y crecer" };
-    state.docs.cv = { nombre:"hoja_de_vida_ana_rios.pdf", kb:412 };
-    state.perfil = { nombre:"Ana María Ríos Bedoya", documento:"1017245896", tipodoc:"Cédula de ciudadanía",
-      tel:"3001234567", mail:"ana.rios@correo.com", dir:"Cra 43A # 5-15", ciudad:"Medellín, Antioquia" };
-    abrirApp();
-    toast("Modo demostración: perfil de Ana María cargado.");
+/* Atajos de demostración:
+   Alt + D → perfil de tecnología (el caso trabajado en el documento)
+   Alt + N → perfil de temporada navideña, sin experiencia previa            */
+const DEMOS = {
+  d: {
+    user:{ nombres:"Ana María", apellidos:"Ríos Bedoya", email:"ana.rios@correo.com",
+           telefono:"3001234567", ciudad:"Medellín" },
+    skills:{ "Python":5, "Django":3, "SQL":4, "Docker":3, "Git":5, "Scrum":3, "Linux":4 },
+    respuestas:{ sector:["Tecnología e informática"], experiencia:"Entre 3 y 6 años",
+      aprender:["Neo4j / Cypher","AWS"], jornada:["Tiempo completo"], modalidad:"Híbrido",
+      salario:"Más de $7.000.000", disponibilidad:"En 15 días", requisitos:["Libreta militar"],
+      prioridad:"Aprender y crecer" },
+    docs:{ cv:{ nombre:"hoja_de_vida_ana_rios.pdf", kb:412 } },
+    perfil:{ nombre:"Ana María Ríos Bedoya", documento:"1017245896", tipodoc:"Cédula de ciudadanía",
+      tel:"3001234567", mail:"ana.rios@correo.com", dir:"Cra 43A # 5-15", ciudad:"Medellín, Antioquia" },
+    aviso:"Modo demostración: perfil de Ana María, sector tecnología."
+  },
+  n: {
+    user:{ nombres:"Camilo", apellidos:"Zapata Ospina", email:"camilo.zapata@correo.com",
+           telefono:"3109876543", ciudad:"Medellín" },
+    skills:{ "Trabajo en equipo":4, "Puntualidad":5, "Atención al cliente":3,
+             "Carga y descarga":3, "Alistamiento de pedidos":2 },
+    respuestas:{ sector:["Logística y bodega","Ventas y comercio"], experiencia:"Menos de 1 año",
+      aprender:["Manejo de inventarios","Manejo de caja"],
+      jornada:["Temporal o por temporada","Por turnos","Medio tiempo"], modalidad:"Presencial",
+      salario:"Hasta $1.500.000", disponibilidad:"Inmediatamente",
+      requisitos:["Libreta militar","Moto o vehículo propio"], prioridad:"Que quede cerca de mi casa" },
+    docs:{ cv:{ nombre:"hoja_de_vida_camilo_zapata.pdf", kb:186 } },
+    perfil:{ nombre:"Camilo Zapata Ospina", documento:"1035784412", tipodoc:"Cédula de ciudadanía",
+      tel:"3109876543", mail:"camilo.zapata@correo.com", dir:"Calle 78 # 45-12", ciudad:"Medellín, Antioquia" },
+    aviso:"Modo demostración: perfil de Camilo, busca temporal de fin de año."
   }
+};
+
+addEventListener("keydown", e => {
+  if(!e.altKey) return;
+  const demo = DEMOS[e.key.toLowerCase()];
+  if(!demo) return;
+  state.user = {...demo.user};
+  state.skills = {...demo.skills};
+  state.respuestas = JSON.parse(JSON.stringify(demo.respuestas));
+  state.docs = {...demo.docs};
+  state.perfil = {...demo.perfil};
+  state.guardadas.clear(); badge();
+  abrirApp();
+  toast(demo.aviso);
 });
 </script>
 </body>
