@@ -1,6 +1,6 @@
 # SkillGraph AI — Matching explicable de vacantes y competencias
 
-Proyecto final de Sistemas de Información · Periodo 2026-2
+Equipo de trabajo: Sebastian Urrego Ramirez, Juan Manuel Agudelo Salazar, Juan Pablo López Lidueña
 
 Plataforma de recomendación de empleo **para cualquier sector del mercado laboral**: calcula el
 ajuste entre una persona y una vacante recorriendo un grafo de habilidades en Neo4j, y devuelve
@@ -14,12 +14,8 @@ ingeniería de datos, y el cuestionario se adapta al área que la persona elige.
 
 | Carpeta / archivo | Descripción |
 |---|---|
-| `SkillGraph_AI_Entrega1.md` | Documento completo de la primera entrega |
 | `prototipo/index.html` | Prototipo navegable. Se abre con doble clic, sin instalar nada |
 | `poc/` | Prueba de concepto: conexión Django ↔ Neo4j, esquema del grafo y dependencias |
-| `media/` | Diagramas y wireframes del documento |
-| `backlog_historias.csv` | Las 30 historias de usuario para importar a GitHub Projects |
-| `GUIA_GIT.md` | Flujo de trabajo del equipo con Git |
 
 ## Probar el prototipo
 
