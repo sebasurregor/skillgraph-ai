@@ -46,3 +46,13 @@ def subgrafo(match, sigla, sujeto="Usted"):
     return {"items": items, "alto": alto, "cy": centro, "sigla": sigla, "sujeto": sujeto,
             "cy_arriba": centro - 1, "cy_abajo": centro + 11,
             "y_vacante": centro - 24, "y_sigla": centro - 3}
+
+
+@register.filter
+def clase_nivel(habilidad):
+    """Color de una habilidad cubierta según qué tan lejos está del nivel exigido.
+
+    Verde si lo alcanza; naranja si no, más claro cuanto más cerca está.
+    """
+    brecha = habilidad["nivel_min"] - habilidad["nivel"]
+    return "tag-ok" if brecha <= 0 else f"tag-brecha brecha-{min(brecha, 4)}"

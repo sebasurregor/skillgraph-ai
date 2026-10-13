@@ -58,3 +58,14 @@ a.chip{text-decoration:none;color:inherit}
 .form-postular{display:inline}
 .tag-aviso{background:var(--warn-soft);color:var(--warn)}
 .job-actions form.row{gap:8px}
+
+/* Habilidades por debajo del nivel exigido: naranja, más claro cuanto más cerca del nivel */
+.tag-brecha{border:1px solid transparent}
+.brecha-1{background:#FFF5E6;color:#A8640F;border-color:#FBE3BF}
+.brecha-2{background:#FDE7C4;color:#96560A;border-color:#F8D49B}
+.brecha-3{background:#FAD49B;color:#7E4506;border-color:#F3BD72}
+.brecha-4{background:#F5BD6E;color:#653503;border-color:#EBA548}
+.alert-nivel{background:#FFF8EE;border:1.5px solid #F8D49B;color:#96560A;font-weight:500;flex-wrap:wrap;align-items:center}
+.cambios{background:var(--sky-soft);border:1.5px solid var(--sky);border-radius:var(--r-md);padding:13px 15px;margin-bottom:14px}
+.sube{color:#0A6B32;font-weight:700}
+.baja{color:var(--danger);font-weight:700}
