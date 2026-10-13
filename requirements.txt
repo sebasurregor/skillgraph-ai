@@ -6,6 +6,10 @@ python-dotenv==1.0.1
 # ---- Cifrado de contraseñas (HU-RNF-001) ---------------------------------
 bcrypt==4.2.0
 
+# ---- Lectura de hojas de vida (HU-RF-003) ---------------------------------
+pdfplumber==0.11.4
+python-docx==1.1.2
+
 # ---- API REST y serialización -------------------------------------------
 djangorestframework==3.15.2
 
