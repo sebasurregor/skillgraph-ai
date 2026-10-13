@@ -24,6 +24,9 @@ CANDIDATOS = [
         "habilidades": {"Python": 5, "Django": 3, "SQL": 4, "Docker": 3, "Git": 5, "Scrum": 3,
                         "Linux": 4},
         "por_aprender": ["Neo4j / Cypher", "AWS"],
+        "experiencia": "TechNova S.A.S. — Desarrolladora backend (2021 a la fecha)\n"
+                       "Andes Analytics — Analista de datos (2019 a 2021)",
+        "educacion": "Ingeniería de Sistemas, Universidad EAFIT, 2019",
     },
     {   # Perfil de temporada, sin experiencia previa (Alt + N en el prototipo).
         "email": "camilo.zapata@correo.com", "first_name": "Camilo",
@@ -31,6 +34,8 @@ CANDIDATOS = [
         "habilidades": {"Trabajo en equipo": 4, "Puntualidad": 5, "Atención al cliente": 3,
                         "Carga y descarga": 3, "Alistamiento de pedidos": 2},
         "por_aprender": ["Manejo de inventarios", "Manejo de caja"],
+        "experiencia": "Distribuidora El Paisa — Auxiliar de cargue (temporada 2024)",
+        "educacion": "Bachiller académico, 2022",
     },
 ]
 
@@ -84,7 +89,9 @@ def cargar():
     for c in CANDIDATOS:
         perfil = perfiles.perfil_de(_usuario(c, Usuario.Rol.CANDIDATO))
         perfiles.guardar_habilidades(perfil, c["habilidades"], c["por_aprender"])
-        en_grafo = perfiles.confirmar_perfil(perfil) and en_grafo
+        datos = perfiles.datos_para_confirmar(perfil)
+        datos.update(experiencia=c["experiencia"], educacion=c["educacion"])
+        en_grafo = perfiles.confirmar_perfil(perfil, datos) and en_grafo
 
     return {"habilidades": total_habilidades, "vacantes": len(demo),
             "candidatos": len(CANDIDATOS), "en_grafo": en_grafo}
