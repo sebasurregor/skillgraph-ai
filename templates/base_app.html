@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block cuerpo %}
+<section class="app">
+  <nav class="rail" aria-label="Navegación principal">
+    <div class="rail-logo">{% include "_logo.html" with tam=20 %}</div>
+
+    <a class="rail-btn{% if seccion == 'inicio' %} active{% endif %}" href="{% url 'cuentas:inicio' %}" aria-label="Inicio">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      <span class="rail-tip">Inicio</span>
+    </a>
+    {% block rail %}{% endblock %}
+
+    <div class="rail-spacer"></div>
+    <form method="post" action="{% url 'cuentas:salir' %}">
+      {% csrf_token %}
+      <button class="rail-btn" type="submit" aria-label="Cerrar sesión">
+        <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 16l4-4-4-4M14 12H4"/></svg>
+        <span class="rail-tip">Cerrar sesión</span>
+      </button>
+    </form>
+    <div class="avatar" title="{{ user.get_full_name }}">{{ user.iniciales }}</div>
+  </nav>
+
+  <main>
+    <div class="view">
+      {% include "_alertas.html" %}
+      {% block contenido %}{% endblock %}
+    </div>
+  </main>
+</section>
+{% endblock %}

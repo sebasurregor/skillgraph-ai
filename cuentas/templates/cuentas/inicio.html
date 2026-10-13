@@ -1,0 +1,28 @@
+{% extends "base_app.html" %}
+{% block titulo %}Inicio · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">{{ user.get_rol_display }}</p>
+    <h1>Hola, {{ user.first_name }}</h1>
+    <p>{% if user.es_reclutador %}Desde aquí publicará vacantes y revisará postulaciones de {{ user.empresa }}.
+       {% else %}Desde aquí cargará su hoja de vida y verá las vacantes que mejor encajan con usted.{% endif %}</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Su cuenta</h3>
+  <div class="setting">
+    <div><b style="font-size:14.5px">{{ user.email }}</b>
+      <p class="small muted">{{ user.get_full_name }} · {{ user.ciudad }} · {{ user.telefono }}</p></div>
+    <form method="post" action="{% url 'cuentas:salir' %}">
+      {% csrf_token %}
+      <button class="btn btn-ghost" type="submit">Cerrar sesión</button>
+    </form>
+  </div>
+  <div class="setting">
+    <div><b style="font-size:14.5px">Sesión protegida</b>
+      <p class="small muted">Por seguridad, la sesión se cierra sola tras 15 minutos sin actividad.</p></div>
+  </div>
+</div>
+{% endblock %}

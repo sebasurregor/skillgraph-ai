@@ -1,0 +1,48 @@
+{% extends "cuentas/_auth.html" %}
+{% load static %}
+{% block titulo %}Crear cuenta · SkillGraph AI{% endblock %}
+{% block lema %}Su perfil es un <em>grafo</em>, no un PDF.{% endblock %}
+{% block sublema %}Cada habilidad que declara se convierte en un nodo conectado a vacantes reales.
+  Por eso podemos explicarle el resultado.{% endblock %}
+{% block tarjeta %}
+<a class="btn btn-quiet" href="{% url 'cuentas:ingresar' %}" style="margin-bottom:14px">← Volver</a>
+<p class="eyebrow">Paso 2 de 2</p>
+<h2>Cree su cuenta</h2>
+<p class="muted small">{% if correo %}No encontramos una cuenta con ese correo. {% endif %}Complete estos datos para continuar.</p>
+
+{% include "_alertas.html" %}
+
+<form method="post" style="margin-top:18px" novalidate data-validar>
+  {% csrf_token %}
+  <div class="field">
+    <span class="lbl">{{ form.rol.label }} <span class="req">*</span></span>
+    <div class="grid-2">
+      {% for opcion in form.rol %}
+      <label class="opt" for="{{ opcion.id_for_label }}">{{ opcion.tag }} <span>{{ opcion.choice_label }}</span></label>
+      {% endfor %}
+    </div>
+    {% for error in form.rol.errors %}<p class="err-msg">{{ error }}</p>{% endfor %}
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    {% include "_campo.html" with campo=form.nombres %}
+    {% include "_campo.html" with campo=form.apellidos %}
+  </div>
+  <div style="margin-top:14px">{% include "_campo.html" with campo=form.correo %}</div>
+  <div class="grid-2" style="margin-top:14px">
+    {% include "_campo.html" with campo=form.telefono %}
+    {% include "_campo.html" with campo=form.ciudad %}
+  </div>
+  <div id="bloque-empresa" style="margin-top:14px">{% include "_campo.html" with campo=form.empresa %}</div>
+  <div class="grid-2" style="margin-top:14px">
+    {% include "_campo.html" with campo=form.clave %}
+    {% include "_campo.html" with campo=form.clave2 %}
+  </div>
+  <label class="row center" for="{{ form.acepta_datos.id_for_label }}" style="margin-top:18px;gap:10px;cursor:pointer">
+    {{ form.acepta_datos }}
+    <span class="tiny muted">{{ form.acepta_datos.label }} <span class="req">*</span></span>
+  </label>
+  {% for error in form.acepta_datos.errors %}<p class="err-msg">{{ error }}</p>{% endfor %}
+  <button class="btn btn-primary btn-block" type="submit" style="margin-top:20px">Crear cuenta</button>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/registro.js' %}"></script>{% endblock %}

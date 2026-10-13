@@ -1,0 +1,12 @@
+{# Alerta de validación del formulario y mensajes del sistema. Requiere `form` en el contexto. #}
+{% for m in messages %}
+<div class="alert {% if m.level_tag == 'success' %}alert-ok{% elif m.level_tag == 'error' %}alert-error{% else %}alert-info{% endif %}" role="status" style="margin-top:18px">
+  <span>{{ m }}</span>
+</div>
+{% endfor %}
+{% if form %}
+<div id="alerta-form" class="alert alert-error{% if not form.mensaje_error %} hidden{% endif %}" role="alert" style="margin-top:18px">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9.5"/></svg>
+  <span>Favor ingresar información válida en los campos obligatorios</span>
+</div>
+{% endif %}

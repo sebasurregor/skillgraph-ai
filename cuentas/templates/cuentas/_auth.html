@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block cuerpo %}
+<section class="auth">
+  <aside class="auth-brand">
+    <div class="brand-mark"><span class="brand-dot">{% include "_logo.html" %}</span>SkillGraph AI</div>
+    <div>
+      <h1 class="auth-claim">{% block lema %}Sepa <em>por qué</em> encaja.{% endblock %}</h1>
+      <p class="auth-sub">{% block sublema %}No le damos un porcentaje y ya. Le mostramos qué habilidades cubre,
+        cuáles le faltan, cuánto pesa cada una y qué necesita aprender para subir el ajuste.{% endblock %}</p>
+    </div>
+    <div class="auth-facts">
+      <div class="auth-fact"><b>16</b><span>áreas ocupacionales</span></div>
+      <div class="auth-fact"><b>3 min</b><span>para su primera recomendación</span></div>
+    </div>
+  </aside>
+  <div class="auth-panel">
+    <div class="auth-card">
+      {% block tarjeta %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}

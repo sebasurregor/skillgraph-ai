@@ -1,0 +1,10 @@
+/* Ajustes propios de la aplicación Django sobre el sistema de diseño del prototipo
+   (static/css/skillgraph.css, copiado sin cambios de prototipo/index.html). */
+
+a.btn, a.rail-btn{text-decoration:none}
+.rail form{display:contents}
+
+/* Casillas y opciones de radio también se resaltan cuando son inválidas */
+input[type="checkbox"], input[type="radio"]{width:18px;height:18px;accent-color:#0DBA4E;flex:none}
+input[type="checkbox"].is-invalid, input[type="radio"].is-invalid{outline:2px solid var(--danger);outline-offset:2px}
+.opt:has(input:checked){border-color:var(--green);background:var(--green-soft);color:#0A6B32;font-weight:600}

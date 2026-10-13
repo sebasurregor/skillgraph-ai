@@ -1,0 +1,17 @@
+{% extends "cuentas/_auth.html" %}
+{% block titulo %}Contraseña · SkillGraph AI{% endblock %}
+{% block lema %}Qué bueno verle de nuevo.{% endblock %}
+{% block sublema %}Su grafo de habilidades sigue donde lo dejó.{% endblock %}
+{% block tarjeta %}
+<a class="btn btn-quiet" href="{% url 'cuentas:ingresar' %}" style="margin-bottom:14px">← Usar otro correo</a>
+<h2>Ingrese su contraseña</h2>
+<p class="muted small" id="correo-ingreso">{{ correo }}</p>
+
+{% include "_alertas.html" %}
+
+<form method="post" class="stack-16" style="margin-top:18px" novalidate data-validar>
+  {% csrf_token %}
+  {% include "_campo.html" with campo=form.clave %}
+  <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
+</form>
+{% endblock %}

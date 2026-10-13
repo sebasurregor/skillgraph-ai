@@ -1,0 +1,19 @@
+{% extends "cuentas/_auth.html" %}
+{% block titulo %}Ingresar · SkillGraph AI{% endblock %}
+{% block tarjeta %}
+<p class="eyebrow">Paso 1 de 2</p>
+<h2>Empecemos por su correo</h2>
+<p class="muted small">Si ya tiene cuenta, le pedimos la contraseña. Si no, creamos una en 30 segundos.</p>
+
+{% include "_alertas.html" %}
+
+<form method="post" class="stack-16" style="margin-top:18px" novalidate data-validar>
+  {% csrf_token %}
+  {% include "_campo.html" with campo=form.correo %}
+  <button class="btn btn-primary btn-block" type="submit">Continuar</button>
+</form>
+
+<p class="tiny muted" style="margin-top:22px;text-align:center;line-height:1.6">
+  Al continuar acepta la política de tratamiento de datos personales<br>conforme a la Ley 1581 de 2012.
+</p>
+{% endblock %}
