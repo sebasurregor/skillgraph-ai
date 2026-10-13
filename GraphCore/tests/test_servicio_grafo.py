@@ -97,3 +97,17 @@ def test_grafo_cuenta_candidatos_que_cubren_las_habilidades(grafo):
     assert "(c:Candidato)-[t:TIENE]->(:Skill {nombre: q.nombre})" in cypher
     assert "t.nivel >= q.nivel_min" in cypher
     assert params == {"exigidas": exigidas, "minimo": 1}
+
+
+def test_check_graph_no_deja_nodos_de_prueba_en_el_grafo(grafo):
+    from io import StringIO
+
+    from django.core.management import call_command
+    grafo.respuesta_lectura = [{"nombre": "Neo4j Kernel", "version": "5.26", "edicion": "x",
+                                "candidato": "Candidato de prueba", "habilidad": "Cypher",
+                                "categoria": "Lenguaje de consulta", "nivel": 3}]
+    call_command("check_graph", stdout=StringIO())
+    assert grafo.escrituras_con("MATCH (c:Candidato {usuario_id: $usuario_id}) DETACH DELETE c")
+    (cypher, params), = grafo.escrituras_con("DELETE s")
+    assert "WHERE NOT (s)--()" in cypher     # no borra una habilidad que alguien use
+    assert params == {"skill": "Cypher"}

@@ -67,13 +67,18 @@ class Command(BaseCommand):
                 f"{fila['habilidad']} ({fila['categoria']})"
             ))
 
-        # --- Limpieza del nodo de prueba -----------------------------------
+        # --- Limpieza de los nodos de prueba -------------------------------
         Neo4jConnection.write(
             "MATCH (c:Candidato {usuario_id: $usuario_id}) DETACH DELETE c",
             usuario_id=0,
         )
+        # La habilidad de prueba solo se borra si nadie más la usa.
+        Neo4jConnection.write(
+            "MATCH (s:Skill {nombre: $skill}) WHERE NOT (s)--() DELETE s",
+            skill="Cypher",
+        )
         self.stdout.write("-" * 62)
         self.stdout.write(self.style.SUCCESS(
             f"Prueba de concepto superada en {transcurrido:.1f} ms. "
-            "Nodo de prueba eliminado."
+            "Nodos de prueba eliminados."
         ))
