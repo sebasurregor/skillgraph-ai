@@ -106,3 +106,28 @@ class VersionPerfil(models.Model):
 
     def __str__(self):
         return f"{self.perfil} · versión {self.numero}"
+
+
+class PreferenciaLaboral(models.Model):
+    """Qué busca el candidato (HU-RF-004). Filtra sus recomendaciones."""
+
+    perfil = models.OneToOneField(PerfilCandidato, on_delete=models.CASCADE,
+                                  related_name="preferencias")
+    cargos = models.JSONField(default=list, blank=True)
+    ubicaciones = models.JSONField(default=list, blank=True)
+    tipos_contrato = models.JSONField(default=list, blank=True)
+    salario_min = models.PositiveIntegerField("salario mínimo esperado", null=True, blank=True)
+    salario_max = models.PositiveIntegerField("salario máximo esperado", null=True, blank=True)
+    actualizada_en = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "preferencia laboral"
+        verbose_name_plural = "preferencias laborales"
+
+    def __str__(self):
+        return f"Preferencias de {self.perfil.usuario}"
+
+    @property
+    def vacias(self):
+        return not (self.cargos or self.ubicaciones or self.tipos_contrato
+                    or self.salario_min or self.salario_max)

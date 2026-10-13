@@ -8,8 +8,9 @@ from django.db.models import Max
 
 from GraphCore import servicio_grafo
 from perfiles.extraccion import extractor, lectores
-from perfiles.models import HabilidadCandidato, HojaDeVida, PerfilCandidato, VersionPerfil
-from vacantes.models import AreaOcupacional, Habilidad
+from perfiles.models import (HabilidadCandidato, HojaDeVida, PerfilCandidato,
+                             PreferenciaLaboral, VersionPerfil)
+from vacantes.models import AreaOcupacional, Habilidad, Vacante
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +168,48 @@ def sincronizar_candidato_en_grafo(perfil):
     usuario = perfil.usuario
     return servicio_grafo.sincronizar_candidato(
         usuario.pk,
-        {"titular": usuario.get_full_name(), "ciudad": usuario.ciudad},
+        {"titular": perfil.nombre_completo or usuario.get_full_name(), "ciudad": usuario.ciudad},
         [{"nombre": h.habilidad.nombre, "nivel": h.nivel}
          for h in perfil.habilidades.select_related("habilidad")],
     )
+
+
+# ---- Preferencias laborales (HU-RF-004) ---------------------------------------
+
+CIUDADES_BASE = ["Medellín", "Bogotá", "Cali", "Barranquilla", "Bucaramanga", "Pereira", "Remoto"]
+CAMPOS_PREFERENCIAS = ("cargos", "ubicaciones", "tipos_contrato", "salario_min", "salario_max")
+
+
+def preferencias_de(perfil):
+    """Preferencias guardadas del perfil, o None si nunca las ha definido."""
+    return PreferenciaLaboral.objects.filter(perfil=perfil).first()
+
+
+def opciones_de_preferencias(preferencias=None):
+    """Opciones que se ofrecen: salen de las vacantes publicadas, más lo ya elegido."""
+    publicadas = Vacante.objects.filter(estado=Vacante.Estado.PUBLICADA)
+    elegidos = preferencias or PreferenciaLaboral()
+
+    def unir(base, propios):
+        return sorted({v for v in list(base) + list(propios) if v})
+
+    return {
+        "cargos": unir(publicadas.values_list("cargo", flat=True), elegidos.cargos),
+        "ubicaciones": unir(CIUDADES_BASE + list(publicadas.values_list("ciudad", flat=True)),
+                            elegidos.ubicaciones),
+        "tipos_contrato": [j for j, _ in Vacante.JORNADAS],
+    }
+
+
+@transaction.atomic
+def guardar_preferencias(perfil, datos, por_aprender=None):
+    """Crea o actualiza las preferencias. `por_aprender`: habilidades (modelos) o None."""
+    preferencias, _ = PreferenciaLaboral.objects.get_or_create(perfil=perfil)
+    for campo in CAMPOS_PREFERENCIAS:
+        if campo in datos:
+            setattr(preferencias, campo, datos[campo])
+    preferencias.save()
+    if por_aprender is not None:
+        perfil.por_aprender.set(por_aprender)
+    logger.info("Preferencias del usuario %s actualizadas", perfil.usuario_id)
+    return preferencias

@@ -62,3 +62,29 @@ def _contar_sqlite(exigidas, minimo):
     return (_perfiles_confirmados()
             .annotate(cubiertas=Count("habilidades__habilidad", filter=cubre, distinct=True))
             .filter(cubiertas__gte=minimo).count())
+
+
+# ---- Preferencias laborales (HU-RF-004) ---------------------------------------
+
+def filtrar_por_preferencias(vacantes, preferencias):
+    """Deja solo las vacantes que encajan con lo que el candidato dijo buscar.
+
+    Dentro de cada preferencia basta una coincidencia (un cargo u otro); entre
+    preferencias deben cumplirse todas. Una preferencia sin opciones no filtra.
+    Del rango salarial se usa el mínimo: una vacante que paga más del máximo
+    esperado no se descarta.
+    """
+    if preferencias is None:
+        return vacantes
+    if preferencias.cargos:
+        vacantes = vacantes.filter(cargo__in=preferencias.cargos)
+    if preferencias.ubicaciones:
+        en_ciudad = Q(ciudad__in=preferencias.ubicaciones)
+        if "Remoto" in preferencias.ubicaciones:
+            en_ciudad |= Q(modalidad="Remoto")
+        vacantes = vacantes.filter(en_ciudad)
+    if preferencias.tipos_contrato:
+        vacantes = vacantes.filter(jornada__in=preferencias.tipos_contrato)
+    if preferencias.salario_min:
+        vacantes = vacantes.filter(salario__gte=preferencias.salario_min)
+    return vacantes
