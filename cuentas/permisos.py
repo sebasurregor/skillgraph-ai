@@ -25,3 +25,11 @@ class EsReclutador(BasePermission):
     def has_permission(self, request, view):
         usuario = request.user
         return bool(usuario and usuario.is_authenticated and usuario.es_reclutador)
+
+
+class EsCandidato(BasePermission):
+    """Permiso de DRF: sesión iniciada con rol de candidato."""
+
+    def has_permission(self, request, view):
+        usuario = request.user
+        return bool(usuario and usuario.is_authenticated and usuario.es_candidato)
