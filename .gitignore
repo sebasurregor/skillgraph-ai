@@ -19,3 +19,8 @@ desktop.ini
 ~$*.docx
 ~$*.xlsx
 ~$*.pptx
+node_modules/
+package-lock.json
+.coverage
+htmlcov/
+.pytest_cache/

@@ -1,0 +1,10 @@
+[run]
+source = .
+omit =
+    venv/*
+    */migrations/*
+    */tests/*
+    manage.py
+    skillgraph/asgi.py
+    skillgraph/wsgi.py
+    conftest.py
