@@ -29,6 +29,7 @@
         <td class="small muted">{{ v.actualizada_en|date:"j M Y, H:i" }}</td>
         <td>
           <div class="acciones">
+            <a class="btn btn-primary btn-sm" href="{% url 'postulaciones:de_vacante' v.pk %}">Ver postulaciones ({{ v.num_postulaciones }})</a>
             <a class="btn btn-ghost btn-sm" href="{% url 'vacantes:editar' v.pk %}">Editar</a>
             {% if v.publicada %}
             <form method="post" action="{% url 'vacantes:despublicar' v.pk %}">{% csrf_token %}

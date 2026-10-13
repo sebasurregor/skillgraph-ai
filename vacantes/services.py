@@ -79,7 +79,8 @@ def errores_de_publicacion(datos, requisitos):
 def vacantes_de(reclutador):
     return (Vacante.objects.filter(reclutador=reclutador)
             .select_related("area")
-            .annotate(num_requisitos=Count("requisitos"))
+            .annotate(num_requisitos=Count("requisitos", distinct=True),
+                      num_postulaciones=Count("postulaciones", distinct=True))
             .order_by("-actualizada_en"))
 
 
