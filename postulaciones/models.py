@@ -19,6 +19,10 @@ class Postulacion(models.Model):
     estado = models.CharField(max_length=16, choices=Estado.choices, default=Estado.ENVIADA)
     ajuste_al_postular = models.PositiveSmallIntegerField(
         help_text="Porcentaje de match en el momento de postularse.")
+    perfil_al_postular = models.JSONField(
+        default=dict, blank=True,
+        help_text="Fotografía del perfil en el momento de postularse: datos de contacto, "
+                  "experiencia, educación, habilidades con su nivel y hoja de vida.")
     creada_en = models.DateTimeField(auto_now_add=True)
     actualizada_en = models.DateTimeField(auto_now=True)
 

@@ -37,7 +37,8 @@ def postular(usuario, vacante_id):
     try:
         with transaction.atomic():
             postulacion = Postulacion.objects.create(
-                candidato=perfil, vacante=vacante, ajuste_al_postular=match.pct)
+                candidato=perfil, vacante=vacante, ajuste_al_postular=match.pct,
+                perfil_al_postular=fotografia_del_perfil(perfil))
     except IntegrityError:      # dos envíos simultáneos: la base de datos garantiza la unicidad
         return Postulacion.objects.get(candidato=perfil, vacante=vacante), False
     logger.info("Postulación %s creada (vacante %s)", postulacion.pk, vacante.pk)
@@ -61,17 +62,28 @@ def vacantes_postuladas(usuario):
 def priorizadas(vacante, solo_obligatorias=False):
     """Postulaciones de la vacante ordenadas de mayor a menor match.
 
-    El match se calcula con el servicio único de `matching`, sobre el perfil actual.
-    Devuelve {items: [{postulacion, perfil, match}], total, cumplen, aviso}.
+    El reclutador ve el perfil con el que cada candidato se postuló: el match, el
+    orden y el filtro salen de esa fotografía. Aparte se le muestra qué cambió en
+    el perfil desde entonces y cuál sería el match hoy. Todo se calcula con el
+    servicio único de `matching`.
+    Devuelve {items: [{postulacion, perfil, match, match_actual, cambios, hoja_de_vida}],
+    total, cumplen, aviso}; `perfil` es la fotografía (un diccionario).
     """
     postulaciones = list(vacante.postulaciones.select_related("candidato__usuario"))
     candidatos = [p.candidato for p in postulaciones]
-    resultados, aviso = matching.calcular_lote(candidatos, [vacante])
+    actuales, aviso = matching.calcular_lote(candidatos, [vacante])
 
-    items = [{"postulacion": p, "perfil": p.candidato,
-              "match": resultados[(p.candidato.pk, vacante.pk)],
-              "hoja_de_vida": hoja_de_vida_de(p)}
-             for p in postulaciones]
+    items = []
+    for p in postulaciones:
+        actual = fotografia_del_perfil(p.candidato)
+        foto = p.perfil_al_postular or actual      # postulaciones anteriores a la fotografía
+        match = matching.match_de_instantanea(
+            foto["habilidades"], foto.get("por_aprender", []), vacante)
+        match_actual = actuales[(p.candidato.pk, vacante.pk)]
+        items.append({
+            "postulacion": p, "perfil": foto, "match": match, "match_actual": match_actual,
+            "cambios": cambios_del_perfil(foto, actual, match.pct, match_actual.pct),
+            "hoja_de_vida": hoja_de_vida_de(p)})
     items.sort(key=lambda i: (-i["match"].pct, i["postulacion"].creada_en))
     cumplen = [i for i in items if i["match"].cumple_obligatorias]
     return {"items": cumplen if solo_obligatorias else items, "total": len(items),
@@ -88,9 +100,61 @@ def cambiar_estado(postulacion, estado):
 
 
 def hoja_de_vida_de(postulacion):
-    """Hoja de vida original del candidato: la de su versión válida o la última que subió."""
+    """Hoja de vida original con la que el candidato se postuló, si subió alguna."""
     perfil = postulacion.candidato
+    foto = postulacion.perfil_al_postular
+    if foto:
+        return perfil.hojas_de_vida.filter(pk=foto.get("hoja_de_vida_id")).first()
+    return _hoja_de_vida_vigente(perfil)
+
+
+def _hoja_de_vida_vigente(perfil):
     vigente = perfiles.version_vigente(perfil)
     if vigente and vigente.hoja_de_vida_id:
         return vigente.hoja_de_vida
     return perfil.hojas_de_vida.first()
+
+
+# ---- Fotografía del perfil y cambios desde la postulación ----------------------
+
+DATOS_COMPARADOS = (("nombre_completo", "nombre"), ("correo", "correo"),
+                    ("telefono", "teléfono"), ("experiencia", "experiencia"),
+                    ("educacion", "educación"))
+
+
+def fotografia_del_perfil(perfil):
+    """El perfil tal como está ahora, como datos planos que se pueden guardar."""
+    usuario = perfil.usuario
+    vigente = perfiles.version_vigente(perfil)
+    hoja = _hoja_de_vida_vigente(perfil)
+    return {
+        "nombre_completo": perfil.nombre_completo or usuario.get_full_name(),
+        "correo": perfil.correo or usuario.email,
+        "telefono": perfil.telefono or usuario.telefono,
+        "ciudad": usuario.ciudad,
+        "experiencia": perfil.experiencia, "educacion": perfil.educacion,
+        "habilidades": perfiles.niveles_de(perfil),
+        "por_aprender": sorted(perfil.por_aprender.values_list("nombre", flat=True)),
+        "version": vigente.numero if vigente else None,
+        "hoja_de_vida_id": hoja.pk if hoja else None,
+    }
+
+
+def cambios_del_perfil(antes, ahora, pct_antes, pct_ahora):
+    """Qué cambió en el perfil desde que el candidato se postuló.
+
+    Devuelve {hay, nuevas, retiradas, niveles, datos, pct_antes, pct_ahora, diferencia}.
+    """
+    h_antes, h_ahora = antes["habilidades"], ahora["habilidades"]
+    cambios = {
+        "nuevas": [{"nombre": n, "nivel": h_ahora[n]} for n in sorted(h_ahora.keys() - h_antes)],
+        "retiradas": sorted(h_antes.keys() - h_ahora),
+        "niveles": [{"nombre": n, "antes": h_antes[n], "ahora": h_ahora[n]}
+                    for n in sorted(h_antes.keys() & h_ahora) if h_antes[n] != h_ahora[n]],
+        "datos": [nombre for campo, nombre in DATOS_COMPARADOS
+                  if antes.get(campo) != ahora.get(campo)],
+        "pct_antes": pct_antes, "pct_ahora": pct_ahora, "diferencia": pct_ahora - pct_antes,
+    }
+    cambios["hay"] = bool(cambios["nuevas"] or cambios["retiradas"] or cambios["niveles"]
+                          or cambios["datos"])
+    return cambios

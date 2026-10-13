@@ -254,11 +254,24 @@ def _datos_del_grafo(perfiles_, vacantes):
     return datos
 
 
+def _requisitos_de_sqlite(vacante):
+    return [{"nombre": r.habilidad.nombre, "peso": float(r.peso),
+             "nivel_min": r.nivel_minimo, "obligatoria": r.obligatoria}
+            for r in vacante.requisitos.all()]
+
+
 def _datos_de_sqlite(perfil, vacante):
-    requisitos = [{"nombre": r.habilidad.nombre, "peso": float(r.peso),
-                   "nivel_min": r.nivel_minimo, "obligatoria": r.obligatoria}
-                  for r in vacante.requisitos.all()]
-    return perfiles.niveles_de(perfil), requisitos, vacante.centralidad
+    return perfiles.niveles_de(perfil), _requisitos_de_sqlite(vacante), vacante.centralidad
+
+
+def match_de_instantanea(niveles, por_aprender, vacante):
+    """Match de un perfil guardado (por ejemplo, el de cuando se postuló) con la vacante.
+
+    Ese perfil ya no está en el grafo, que solo guarda el actual: los requisitos se
+    leen de SQLite y se aplica la misma fórmula.
+    """
+    return calcular_match(niveles, set(por_aprender), _requisitos_de_sqlite(vacante),
+                          vacante.centralidad)
 
 
 def calcular_lote(perfiles_, vacantes):
