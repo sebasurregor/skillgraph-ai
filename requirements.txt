@@ -3,6 +3,9 @@ Django==5.0
 neo4j>=5.28,<6.0
 python-dotenv==1.0.1
 
+# ---- Cifrado de contraseñas (HU-RNF-001) ---------------------------------
+bcrypt==4.2.0
+
 # ---- API REST y serialización -------------------------------------------
 djangorestframework==3.15.2
 
