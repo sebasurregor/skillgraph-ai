@@ -3,6 +3,7 @@ from functools import wraps
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from rest_framework.permissions import BasePermission
 
 
 def rol_requerido(rol):
@@ -16,3 +17,11 @@ def rol_requerido(rol):
             return vista(request, *args, **kwargs)
         return envoltura
     return decorador
+
+
+class EsReclutador(BasePermission):
+    """Permiso de DRF: sesión iniciada con rol de reclutador."""
+
+    def has_permission(self, request, view):
+        usuario = request.user
+        return bool(usuario and usuario.is_authenticated and usuario.es_reclutador)
