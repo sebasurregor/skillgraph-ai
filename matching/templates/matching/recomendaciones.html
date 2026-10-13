@@ -1,5 +1,5 @@
 {% extends "base_app.html" %}
-{% load humanize matching_extras %}
+{% load humanize matching_extras postulaciones_extras %}
 {% block titulo %}Vacantes recomendadas · SkillGraph AI{% endblock %}
 {% block contenido %}
 <div class="view-head">
@@ -60,6 +60,7 @@
         <span class="tiny muted">de ajuste</span>
       </div>
     </div>
+    <div class="job-actions">{% boton_postular v %}</div>
     <details class="porque">
       <summary class="btn btn-ghost">Ver por qué {{ m.pct }} %</summary>
       {% include "matching/_explicacion.html" with match=m vacante=v %}

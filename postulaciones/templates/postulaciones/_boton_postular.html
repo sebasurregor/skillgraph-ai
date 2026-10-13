@@ -1,0 +1,9 @@
+{% if postulada %}
+<button class="btn btn-ghost" type="button" disabled data-postulada="{{ vacante.pk }}">Postulación enviada ✓</button>
+{% else %}
+<form method="post" action="{% url 'postulaciones:postular' vacante.pk %}" class="form-postular">
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  <input type="hidden" name="siguiente" value="{{ siguiente }}">
+  <button class="btn btn-accent" type="submit" data-postular="{{ vacante.pk }}">Postularme</button>
+</form>
+{% endif %}

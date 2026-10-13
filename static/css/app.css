@@ -52,3 +52,9 @@ a.chip{text-decoration:none;color:inherit}
 .porque[open] summary{background:var(--sky-soft);border-color:var(--sky)}
 .fila-habilidad{margin-top:7px;line-height:1.9}
 .comp .cv{width:110px}
+
+/* Postulaciones (HU-RF-006 y HU-RF-013) */
+.job-actions+.porque{border-top:none;padding-top:0;margin-top:12px}
+.form-postular{display:inline}
+.tag-aviso{background:var(--warn-soft);color:var(--warn)}
+.job-actions form.row{gap:8px}

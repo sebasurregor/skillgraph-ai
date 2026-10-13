@@ -1,0 +1,39 @@
+{% extends "base_app.html" %}
+{% load postulaciones_extras %}
+{% block titulo %}Mis postulaciones · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">Mis postulaciones</p>
+    <h1>Estado de sus postulaciones</h1>
+    <p>Aquí ve cada vacante a la que se postuló y en qué va el proceso.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'recomendaciones:lista' %}">Buscar más vacantes</a>
+</div>
+
+{% if postulaciones %}
+<div class="card tabla-card">
+  <table class="tabla" id="tabla-postulaciones">
+    <thead><tr><th>Vacante</th><th>Se postuló</th><th>Ajuste al postular</th><th>Estado</th></tr></thead>
+    <tbody>
+      {% for p in postulaciones %}
+      <tr data-postulacion="{{ p.pk }}">
+        <td><b>{{ p.vacante.titulo }}</b>
+          <p class="meta">{{ p.vacante.empresa }} · {{ p.vacante.ciudad }} · {{ p.vacante.jornada }}</p></td>
+        <td class="small muted">{{ p.creada_en|date:"j M Y, H:i" }}</td>
+        <td>{{ p.ajuste_al_postular }} %</td>
+        <td><span class="tag {{ p.estado|clase_estado }}" data-estado="{{ p.estado }}">{{ p.get_estado_display }}</span>
+          {% if not p.vacante.publicada %}<p class="tiny muted">La vacante ya no está publicada.</p>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty">
+  <h3>Todavía no se ha postulado a ninguna vacante</h3>
+  <p>En sus vacantes recomendadas, use el botón «Postularme». Con un solo clic enviamos su perfil.</p>
+  <a class="btn btn-primary" href="{% url 'recomendaciones:lista' %}">Ver vacantes recomendadas</a>
+</div>
+{% endif %}
+{% endblock %}
