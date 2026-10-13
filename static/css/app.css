@@ -8,3 +8,21 @@ a.btn, a.rail-btn{text-decoration:none}
 input[type="checkbox"], input[type="radio"]{width:18px;height:18px;accent-color:#0DBA4E;flex:none}
 input[type="checkbox"].is-invalid, input[type="radio"].is-invalid{outline:2px solid var(--danger);outline-offset:2px}
 .opt:has(input:checked){border-color:var(--green);background:var(--green-soft);color:#0A6B32;font-weight:600}
+
+/* Tablas (listas con una acción por registro) */
+.tabla-card{padding:6px 10px;overflow-x:auto}
+.tabla{width:100%;border-collapse:collapse;font-size:14px}
+.tabla th{text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);padding:12px 10px;border-bottom:1.5px solid var(--line)}
+.tabla td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tabla tr:last-child td{border-bottom:none}
+.tabla .centro{text-align:center}
+.acciones{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.acciones form{display:inline}
+.btn-sm{padding:8px 13px;font-size:13px}
+.btn-peligro{background:var(--danger);color:#fff}
+.peligro{color:var(--danger)}
+.tag-neutro{background:var(--sky-soft);color:var(--navy-2)}
+.suma-ok b{color:#0A6B32}
+.suma-mal b{color:var(--danger)}
+.solo-lectores{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.alert-aviso{background:var(--warn-soft);border:1.5px solid var(--warn);color:var(--warn);font-weight:500}

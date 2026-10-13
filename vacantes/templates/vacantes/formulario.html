@@ -1,0 +1,77 @@
+{% extends "base_app.html" %}
+{% load static %}
+{% block titulo %}{% if vacante %}Editar vacante{% else %}Nueva vacante{% endif %} · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">Mis vacantes</p>
+    <h1>{% if vacante %}Editar vacante{% else %}Nueva vacante{% endif %}</h1>
+    <p>Los campos con <span class="req">*</span> son obligatorios para publicar. Para guardar un borrador basta el título.</p>
+  </div>
+  {% if vacante %}<span class="tag {% if vacante.publicada %}tag-ok{% else %}tag-neutro{% endif %}">{{ vacante.get_estado_display }}</span>{% endif %}
+</div>
+
+<div id="alerta-form" class="alert alert-error{% if not hay_errores %} hidden{% endif %}" role="alert">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9.5"/></svg>
+  <span>Favor ingresar información válida en los campos obligatorios</span>
+</div>
+
+<form method="post" novalidate data-validar id="form-vacante" style="margin-top:18px">
+  {% csrf_token %}
+  <div class="card">
+    <h3>Datos de la vacante</h3>
+    <div class="grid-2" style="margin-top:16px">
+      {% include "_campo.html" with campo=form.titulo %}
+      {% include "_campo.html" with campo=form.empresa %}
+    </div>
+    <div class="grid-3" style="margin-top:14px">
+      {% include "_campo.html" with campo=form.area %}
+      {% include "_campo.html" with campo=form.cargo %}
+      {% include "_campo.html" with campo=form.ciudad %}
+    </div>
+    <div class="grid-3" style="margin-top:14px">
+      {% include "_campo.html" with campo=form.modalidad %}
+      {% include "_campo.html" with campo=form.jornada %}
+      {% include "_campo.html" with campo=form.salario %}
+    </div>
+    <div style="margin-top:14px">{% include "_campo.html" with campo=form.descripcion %}</div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Habilidades ponderadas</h3>
+    <p class="small muted">Indique qué debe saber hacer la persona, qué nivel mínimo necesita (1 = lo básico, 5 = lo domina)
+      y cuánto pesa cada habilidad. Los pesos deben sumar exactamente 1.00 para publicar.</p>
+
+    {% for error in errores_requisitos %}<p class="err-msg" data-error-requisitos>{{ error }}</p>{% endfor %}
+
+    {{ formset.management_form }}
+    <table class="tabla" id="tabla-requisitos" style="margin-top:12px">
+      <thead><tr><th>Habilidad <span class="req">*</span></th><th>Peso <span class="req">*</span></th><th>Nivel mínimo <span class="req">*</span></th><th class="centro">Obligatoria</th><th></th></tr></thead>
+      <tbody>
+        {% for fila in formset %}{% include "vacantes/_fila_requisito.html" %}{% endfor %}
+      </tbody>
+    </table>
+    <template id="fila-vacia">{% include "vacantes/_fila_requisito.html" with fila=formset.empty_form %}</template>
+
+    <div class="row between center wrap" style="margin-top:14px">
+      <button type="button" class="btn btn-ghost btn-sm" id="agregar-requisito">+ Agregar habilidad</button>
+      <span class="small" id="suma-pesos" aria-live="polite">Suma de pesos: <b>0.00</b> de 1.00</span>
+    </div>
+
+    <div class="explain-box" id="previsualizacion" aria-live="polite"
+         data-url="{% url 'matching:candidatos_potenciales' %}">
+      Agregue habilidades para ver cuántos candidatos potenciales cumplirían los requisitos.
+    </div>
+  </div>
+
+  <div class="row between center wrap" style="margin-top:26px;padding-top:22px;border-top:1px solid var(--line);gap:14px">
+    <a class="btn btn-ghost" href="{% url 'vacantes:lista' %}">← Volver a mis vacantes</a>
+    <div class="row wrap">
+      <button class="btn btn-ghost" type="submit" name="accion" value="borrador"
+              data-validar-solo="#id_titulo">Guardar como borrador</button>
+      <button class="btn btn-accent" type="submit" name="accion" value="publicar">Publicar vacante</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/vacante_form.js' %}"></script>{% endblock %}

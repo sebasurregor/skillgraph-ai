@@ -8,6 +8,7 @@
     <p>{% if user.es_reclutador %}Desde aquí publicará vacantes y revisará postulaciones de {{ user.empresa }}.
        {% else %}Desde aquí cargará su hoja de vida y verá las vacantes que mejor encajan con usted.{% endif %}</p>
   </div>
+  {% if user.es_reclutador %}<a class="btn btn-primary" href="{% url 'vacantes:lista' %}">Ir a mis vacantes</a>{% endif %}
 </div>
 
 <div class="card">

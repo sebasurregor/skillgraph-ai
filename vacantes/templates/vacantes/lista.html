@@ -1,0 +1,55 @@
+{% extends "base_app.html" %}
+{% load humanize %}
+{% block titulo %}Mis vacantes · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">Reclutador</p>
+    <h1>Mis vacantes</h1>
+    <p>Cree, edite y publique las vacantes de {{ user.empresa|default:"su empresa" }}. Solo las publicadas se recomiendan a los candidatos.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'vacantes:nueva' %}">+ Nueva vacante</a>
+</div>
+
+{% if vacantes %}
+<div class="card tabla-card">
+  <table class="tabla" id="tabla-vacantes">
+    <thead>
+      <tr><th>Vacante</th><th>Estado</th><th>Habilidades</th><th>Actualizada</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for v in vacantes %}
+      <tr data-vacante="{{ v.pk }}">
+        <td>
+          <b>{{ v.titulo }}</b>
+          <p class="meta">{{ v.empresa }}{% if v.ciudad %} · {{ v.ciudad }}{% endif %}{% if v.jornada %} · {{ v.jornada }}{% endif %}{% if v.salario %} · ${{ v.salario|intcomma }}{% endif %}</p>
+        </td>
+        <td><span class="tag {% if v.publicada %}tag-ok{% else %}tag-neutro{% endif %}">{{ v.get_estado_display }}</span></td>
+        <td>{{ v.num_requisitos }}</td>
+        <td class="small muted">{{ v.actualizada_en|date:"j M Y, H:i" }}</td>
+        <td>
+          <div class="acciones">
+            <a class="btn btn-ghost btn-sm" href="{% url 'vacantes:editar' v.pk %}">Editar</a>
+            {% if v.publicada %}
+            <form method="post" action="{% url 'vacantes:despublicar' v.pk %}">{% csrf_token %}
+              <button class="btn btn-ghost btn-sm" type="submit">Despublicar</button></form>
+            {% else %}
+            <form method="post" action="{% url 'vacantes:publicar' v.pk %}">{% csrf_token %}
+              <button class="btn btn-accent btn-sm" type="submit">Publicar</button></form>
+            {% endif %}
+            <a class="btn btn-quiet btn-sm peligro" href="{% url 'vacantes:eliminar' v.pk %}">Eliminar</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty">
+  <h3>Todavía no tiene vacantes</h3>
+  <p>Cree la primera, agregue las habilidades que exige con su peso y publíquela cuando esté lista.</p>
+  <a class="btn btn-primary" href="{% url 'vacantes:nueva' %}">Crear mi primera vacante</a>
+</div>
+{% endif %}
+{% endblock %}

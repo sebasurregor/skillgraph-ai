@@ -64,3 +64,16 @@ class FormularioValidadoMixin:
     def mensaje_error(self):
         """Mensaje único de la alerta; vacío si el formulario es válido."""
         return MSG_OBLIGATORIOS if self.is_bound and self.errors else ""
+
+
+def un_solo_foco(*formularios):
+    """En una página con varios formularios, deja el foco solo en el primer campo inválido."""
+    encontrado = False
+    for formulario in formularios:
+        for campo in formulario.fields.values():
+            attrs = campo.widget.attrs
+            if "autofocus" not in attrs:
+                continue
+            if encontrado:
+                del attrs["autofocus"]
+            encontrado = True

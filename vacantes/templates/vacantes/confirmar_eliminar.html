@@ -1,0 +1,19 @@
+{% extends "base_app.html" %}
+{% block titulo %}Eliminar vacante · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">Mis vacantes</p>
+    <h1>Eliminar vacante</h1>
+  </div>
+</div>
+<div class="card">
+  <h3>¿Eliminar «{{ vacante.titulo }}»?</h3>
+  <p class="small muted">Se borrarán la vacante y sus habilidades ponderadas. Esta acción no se puede deshacer.</p>
+  <form method="post" class="row" style="margin-top:20px">
+    {% csrf_token %}
+    <button class="btn btn-peligro" type="submit">Sí, eliminar</button>
+    <a class="btn btn-ghost" href="{% url 'vacantes:lista' %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

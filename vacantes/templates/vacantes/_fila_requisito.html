@@ -1,0 +1,10 @@
+<tr class="fila-requisito">
+  <td>{{ fila.habilidad }}{% for e in fila.habilidad.errors %}<p class="err-msg">{{ e }}</p>{% endfor %}</td>
+  <td>{{ fila.peso }}{% for e in fila.peso.errors %}<p class="err-msg">{{ e }}</p>{% endfor %}</td>
+  <td>{{ fila.nivel_minimo }}{% for e in fila.nivel_minimo.errors %}<p class="err-msg">{{ e }}</p>{% endfor %}</td>
+  <td class="centro"><label class="solo-lectores" for="{{ fila.obligatoria.id_for_label }}">Obligatoria</label>{{ fila.obligatoria }}</td>
+  <td class="centro">
+    <span class="hidden">{{ fila.DELETE }}</span>
+    <button type="button" class="btn btn-quiet btn-sm peligro" data-quitar>Quitar</button>
+  </td>
+</tr>

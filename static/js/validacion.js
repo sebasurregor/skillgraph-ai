@@ -12,7 +12,10 @@
   document.querySelectorAll("form[data-validar]").forEach(function (form) {
     form.addEventListener("submit", function (e) {
       var primero = null;
+      // Un botón puede limitar la validación (por ejemplo, guardar un borrador).
+      var solo = e.submitter && e.submitter.getAttribute("data-validar-solo");
       form.querySelectorAll("[data-obligatorio]").forEach(function (el) {
+        if (solo && !el.matches(solo)) { el.classList.remove("is-invalid"); return; }
         var malo = esInvalido(el, form);
         el.classList.toggle("is-invalid", malo);
         if (malo) el.setAttribute("aria-invalid", "true"); else el.removeAttribute("aria-invalid");
