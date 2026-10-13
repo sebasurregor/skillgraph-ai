@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "vacantes",
     "perfiles",
     "matching",
+    "postulaciones",
 ]
 
 MIDDLEWARE = [
