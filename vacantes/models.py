@@ -76,6 +76,12 @@ class Vacante(models.Model):
         return self.titulo
 
     @property
+    def sigla(self):
+        """Dos letras para el recuadro de la tarjeta (Logística Express → LE)."""
+        palabras = [p for p in self.empresa.split() if p[0].isalnum()]
+        return "".join(p[0] for p in palabras[:2]).upper() or "?"
+
+    @property
     def publicada(self):
         return self.estado == self.Estado.PUBLICADA
 
