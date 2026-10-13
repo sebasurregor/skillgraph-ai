@@ -170,3 +170,38 @@ def contar_candidatos_que_cubren(exigidas, minimo):
         exigidas=list(exigidas), minimo=minimo,
     )
     return filas[0]["total"] if filas else 0
+
+
+# ---- Matching --------------------------------------------------------------
+
+def candidatos_presentes(usuario_ids):
+    """Subconjunto de candidatos que ya existen como nodo. Lanza `GrafoNoDisponible`."""
+    filas = _ejecutar(
+        Neo4jConnection.read,
+        "MATCH (c:Candidato) WHERE c.usuario_id IN $candidatos "
+        "RETURN collect(c.usuario_id) AS presentes",
+        candidatos=list(usuario_ids),
+    )
+    return set(filas[0]["presentes"]) if filas else set()
+
+
+def recorrido_de_match(usuario_ids, vacante_ids):
+    """Recorre Vacante → REQUIERE → Skill ← TIENE ← Candidato.
+
+    Devuelve una fila por candidato y habilidad requerida:
+    {usuario_id, vacante_id, centralidad, habilidad, peso, nivel_min, obligatoria, nivel};
+    `nivel` es None cuando el candidato no tiene la habilidad. Lanza `GrafoNoDisponible`.
+    """
+    return _ejecutar(
+        Neo4jConnection.read,
+        """
+        MATCH (v:Vacante)-[r:REQUIERE]->(s:Skill)
+        WHERE v.vacante_id IN $vacantes
+        UNWIND $candidatos AS usuario_id
+        OPTIONAL MATCH (c:Candidato {usuario_id: usuario_id})-[t:TIENE]->(s)
+        RETURN usuario_id, v.vacante_id AS vacante_id, v.centralidad AS centralidad,
+               s.nombre AS habilidad, r.peso AS peso, r.nivel_min AS nivel_min,
+               r.obligatoria AS obligatoria, t.nivel AS nivel
+        """,
+        candidatos=list(usuario_ids), vacantes=list(vacante_ids),
+    )
