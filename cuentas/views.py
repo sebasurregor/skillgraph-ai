@@ -33,7 +33,7 @@ def ingresar_clave(request):
     form = ClaveForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         if services.iniciar_sesion(request, correo, form.cleaned_data["clave"]):
-            return redirect("cuentas:inicio")
+            return redirect("raiz")
         form.add_error("clave", "Las credenciales no coinciden. Verifique su contraseña.")
         form.marcar_invalidos()
     return render(request, "cuentas/ingresar_clave.html", {"form": form, "correo": correo})

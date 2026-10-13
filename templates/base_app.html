@@ -14,6 +14,12 @@
       <span class="rail-tip">Mis vacantes</span>
     </a>
     {% endif %}
+    {% if user.es_candidato %}
+    <a class="rail-btn{% if seccion == 'perfil' %} active{% endif %}" href="{% url 'perfiles:mi_perfil' %}" aria-label="Mi perfil">
+      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      <span class="rail-tip">Mi perfil</span>
+    </a>
+    {% endif %}
     {% block rail %}{% endblock %}
 
     <div class="rail-spacer"></div>

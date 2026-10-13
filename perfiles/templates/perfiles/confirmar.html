@@ -1,0 +1,67 @@
+{% extends "base_app.html" %}
+{% block titulo %}Confirme su perfil · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">{% if hoja %}Paso 2 de 2 · {{ hoja.nombre_original }}{% else %}Formulario manual{% endif %}</p>
+    <h1>{% if hoja %}Revise y confirme sus datos{% else %}Complete su perfil{% endif %}</h1>
+    <p>{% if hoja and hoja.suficiente %}Esto fue lo que leímos en su hoja de vida. Corrija lo que haga falta.
+      Los campos resaltados en amarillo no los pudimos extraer.
+      {% elif hoja %}No pudimos leer su hoja de vida. Complete los datos a mano; su archivo quedó guardado.
+      {% else %}Escriba sus datos y marque lo que sabe hacer.{% endif %}</p>
+  </div>
+  <a class="btn btn-ghost" href="{% url 'perfiles:cargar_cv' %}">{% if hoja %}Subir otra hoja de vida{% else %}Prefiero subir mi hoja de vida{% endif %}</a>
+</div>
+
+{% include "_alerta_form.html" with visible=form.mensaje_error %}
+
+<form method="post" novalidate data-validar style="margin-top:18px">
+  {% csrf_token %}
+  <div class="card">
+    <h3>Datos de contacto</h3>
+    <div style="margin-top:16px">{% include "_campo.html" with campo=form.nombre_completo %}</div>
+    <div class="grid-2" style="margin-top:14px">
+      {% include "_campo.html" with campo=form.correo %}
+      {% include "_campo.html" with campo=form.telefono %}
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Trayectoria</h3>
+    <div style="margin-top:16px">{% include "_campo.html" with campo=form.experiencia %}</div>
+    <div style="margin-top:14px">{% include "_campo.html" with campo=form.educacion %}</div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="bloque-habilidades">
+    <h3>Lo que sabe hacer <span class="req">*</span></h3>
+    <p class="small muted">Marque sus habilidades y, en cada una, qué tan bien lo hace: 1 = lo básico, 5 = lo domina.
+      Con esto calculamos su ajuste con cada vacante.</p>
+    {% for error in form.habilidades.errors %}<p class="err-msg" data-error-habilidades>{{ error }}</p>{% endfor %}
+    {% if form.habilidades_sin_extraer %}
+    <p class="bloque-sin-extraer aviso-campo" data-sin-extraer="habilidades">No reconocimos habilidades en su hoja de vida. Márquelas en la lista.</p>
+    {% endif %}
+
+    {% for titulo, items, abierto in form.grupos_habilidades %}
+    <details class="grupo-habs{% if form.habilidades.errors and forloop.first %} is-invalid{% endif %}"{% if abierto or forloop.first %} open{% endif %}>
+      <summary>{{ titulo }} <span class="tiny muted">({{ items|length }})</span></summary>
+      <div class="habs">
+        {% for item in items %}
+        <label class="hab">
+          <input type="checkbox" name="habilidades" value="{{ item.habilidad.pk }}"{% if item.marcada %} checked{% endif %}{% if form.habilidades.errors and forloop.first and forloop.parentloop.first %} autofocus{% endif %}>
+          <span>{{ item.habilidad.nombre }}</span>
+          <select name="nivel_{{ item.habilidad.pk }}" aria-label="Nivel en {{ item.habilidad.nombre }}">
+            {% for n in "12345" %}<option value="{{ n }}"{% if n|add:0 == item.nivel %} selected{% endif %}>{{ n }}</option>{% endfor %}
+          </select>
+        </label>
+        {% endfor %}
+      </div>
+    </details>
+    {% endfor %}
+  </div>
+
+  <div class="row between center wrap" style="margin-top:26px;padding-top:22px;border-top:1px solid var(--line);gap:14px">
+    <span class="small muted">Al confirmar guardamos esta información como la versión válida de su perfil.</span>
+    <button class="btn btn-accent" type="submit">Confirmar mi perfil →</button>
+  </div>
+</form>
+{% endblock %}

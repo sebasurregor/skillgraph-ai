@@ -1,0 +1,58 @@
+{% extends "base_app.html" %}
+{% block titulo %}Mi perfil · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">Mi perfil</p>
+    <h1>{{ perfil.nombre_completo|default:user.get_full_name }}</h1>
+    <p>{% if vigente %}Versión {{ vigente.numero }} confirmada el {{ vigente.confirmada_en|date:"j \d\e F \d\e Y, H:i" }} · origen: {{ vigente.get_origen_display|lower }}.
+       {% else %}Todavía no ha confirmado su perfil.{% endif %}</p>
+  </div>
+  <div class="row wrap">
+    <a class="btn btn-ghost" href="{% url 'perfiles:confirmar_manual' %}">Editar a mano</a>
+    <a class="btn btn-primary" href="{% url 'perfiles:cargar_cv' %}">{% if perfil.confirmado %}Reemplazar hoja de vida{% else %}Subir hoja de vida{% endif %}</a>
+  </div>
+</div>
+
+{% if perfil.confirmado %}
+<div class="card">
+  <h3>Datos de contacto</h3>
+  <p class="small muted" style="margin-top:6px">{{ perfil.correo }} · {{ perfil.telefono }}</p>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h3>Habilidades ({{ habilidades|length }})</h3>
+  <div class="tags">
+    {% for h in habilidades %}<span class="tag tag-ok">{{ h.habilidad.nombre }} · nivel {{ h.nivel }}</span>{% endfor %}
+  </div>
+</div>
+
+<div class="grid-2" style="margin-top:16px">
+  <div class="card"><h3>Experiencia</h3><p class="texto-largo" style="margin-top:8px">{{ perfil.experiencia|default:"Sin experiencia registrada." }}</p></div>
+  <div class="card"><h3>Educación</h3><p class="texto-largo" style="margin-top:8px">{{ perfil.educacion|default:"Sin estudios registrados." }}</p></div>
+</div>
+
+<div class="card tabla-card" style="margin-top:16px">
+  <table class="tabla" id="tabla-versiones">
+    <thead><tr><th>Versión</th><th>Confirmada</th><th>Origen</th><th>Archivo</th><th>Habilidades</th></tr></thead>
+    <tbody>
+      {% for v in versiones %}
+      <tr>
+        <td><b>{{ v.numero }}</b>{% if forloop.first %} <span class="tag tag-ok">Válida</span>{% endif %}</td>
+        <td class="small muted">{{ v.confirmada_en|date:"j M Y, H:i" }}</td>
+        <td>{{ v.get_origen_display }}</td>
+        <td class="small">{{ v.hoja_de_vida.nombre_original|default:"—" }}</td>
+        <td>{{ v.datos.habilidades|length }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty">
+  <h3>Empiece por su hoja de vida</h3>
+  <p>Súbala en PDF o Word y llenamos su perfil por usted. Si no tiene, puede llenarlo a mano.</p>
+  <a class="btn btn-primary" href="{% url 'perfiles:cargar_cv' %}">Subir mi hoja de vida</a>
+</div>
+{% endif %}
+{% endblock %}

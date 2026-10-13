@@ -1,6 +1,6 @@
 {# Alerta de validación del formulario y mensajes del sistema. Requiere `form` en el contexto. #}
 {% for m in messages %}
-<div class="alert {% if m.level_tag == 'success' %}alert-ok{% elif m.level_tag == 'error' %}alert-error{% elif m.level_tag == 'warning' %}alert-aviso{% else %}alert-info{% endif %}" role="status" style="margin-top:18px"{% if m.level_tag == 'warning' %} data-aviso-grafo{% endif %}>
+<div class="alert {% if m.level_tag == 'success' %}alert-ok{% elif m.level_tag == 'error' %}alert-error{% elif m.level_tag == 'warning' %}alert-aviso{% else %}alert-info{% endif %}" role="status" style="margin-top:18px"{% if m.extra_tags == 'grafo' %} data-aviso-grafo{% endif %}>
   <span>{{ m }}</span>
 </div>
 {% endfor %}

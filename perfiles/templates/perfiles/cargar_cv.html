@@ -1,0 +1,40 @@
+{% extends "base_app.html" %}
+{% block titulo %}Su hoja de vida · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">{% if perfil.confirmado %}Actualizar perfil{% else %}Paso 1 de 2{% endif %}</p>
+    <h1>{% if perfil.confirmado %}Reemplace su hoja de vida{% else %}Empiece por su hoja de vida{% endif %}</h1>
+    <p>Súbala y llenamos el formulario por usted: nombre, contacto, experiencia, educación y habilidades.
+      Después solo tiene que revisar y confirmar. Sirve para cualquier oficio.</p>
+  </div>
+</div>
+
+{% include "_alerta_form.html" with visible=form.mensaje_error %}
+
+<form method="post" enctype="multipart/form-data" novalidate data-validar style="margin-top:18px">
+  {% csrf_token %}
+  <div class="card">
+    <div class="drop{% if form.archivo.errors %} is-invalid{% endif %}">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--navy-2)" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <p style="font-weight:600;font-size:14px;margin-top:8px">
+        <label for="{{ form.archivo.id_for_label }}">Seleccione su hoja de vida <span class="req">*</span></label></p>
+      <p class="tiny muted">PDF o Word (.docx) · máximo 5 MB</p>
+      {{ form.archivo }}
+      {% for error in form.archivo.errors %}<p class="err-msg" data-error-archivo>{{ error }}</p>{% endfor %}
+    </div>
+    <div class="row between center wrap" style="margin-top:18px;gap:14px">
+      <a class="btn btn-quiet" href="{% url 'perfiles:confirmar_manual' %}" id="enlace-manual">No tengo hoja de vida: llenar el formulario a mano</a>
+      <button class="btn btn-accent" type="submit">Subir y leer mi hoja de vida →</button>
+    </div>
+  </div>
+</form>
+
+<div class="card" style="margin-top:16px">
+  <h3>Qué hacemos con su archivo</h3>
+  <p class="small muted">Buscamos sus datos de contacto, su experiencia, sus estudios y las habilidades que
+    reconocemos en nuestro catálogo de 16 áreas de trabajo. Nada se publica hasta que usted confirme.
+    Si su hoja de vida es una foto o un documento escaneado no podremos leerla, y le pediremos completar los datos a mano.</p>
+</div>
+{% endblock %}

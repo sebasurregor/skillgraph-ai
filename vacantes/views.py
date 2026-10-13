@@ -21,7 +21,7 @@ def _vacante_propia(request, pk):
 
 def _avisar_si_falta_grafo(request, en_grafo):
     if not en_grafo:
-        messages.warning(request, AVISO_GRAFO)
+        messages.warning(request, AVISO_GRAFO, extra_tags="grafo")
 
 
 @solo_reclutador
