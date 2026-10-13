@@ -9,6 +9,7 @@ from django.urls import reverse
 
 from cuentas.models import Usuario
 from matching import services as matching
+from matching.templatetags.matching_extras import clase_nivel
 from perfiles import services as perfiles
 from postulaciones import services
 from postulaciones.models import Postulacion
@@ -86,19 +87,82 @@ def test_rf013_usa_el_mismo_servicio_de_matching_que_las_recomendaciones(
     ana = postulados["ana"].perfil
     en_recomendaciones = {i["vacante"].pk: i["match"].pct
                           for i in matching.recomendar(ana)["items"]}[backend.pk]
-    en_postulaciones = {i["perfil"].pk: i["match"].pct
+    en_postulaciones = {i["postulacion"].candidato_id: i["match"].pct
                         for i in services.priorizadas(backend)["items"]}[ana.pk]
     assert en_recomendaciones == en_postulaciones == 82
 
 
-def test_rf013_el_orden_se_actualiza_si_el_candidato_mejora_su_perfil(
+def test_rf013_muestra_el_perfil_con_el_que_se_postulo_aunque_luego_lo_cambie(
+        sesion, backend, postulados):
+    antes = orden(pagina(sesion, backend))
+    aprendiz = postulados["aprendiz"].perfil
+    perfiles.confirmar_perfil(aprendiz, niveles={
+        "Python": 5, "Django": 5, "Neo4j / Cypher": 5, "Docker": 5, "Scrum": 5})
+
+    html = pagina(sesion, backend)
+    assert orden(html) == antes                      # el orden y el % son los de la postulación
+    andres = tarjeta(html, "Andrés Prueba")
+    coincidencias = andres.split('data-lista="coincidencias"')[1].split("</div>")[0]
+    assert "Python · peso 0.30 · nivel 2/4" in coincidencias
+    assert "Django" not in coincidencias
+
+
+def test_rf013_avisa_que_el_perfil_cambio_y_cual_seria_el_ajuste_hoy(
         sesion, backend, postulados):
     aprendiz = postulados["aprendiz"].perfil
     perfiles.confirmar_perfil(aprendiz, niveles={
         "Python": 5, "Django": 5, "Neo4j / Cypher": 5, "Docker": 5, "Scrum": 5})
-    candidatos = orden(pagina(sesion, backend))
-    assert candidatos[0][0] in ("Andrés Prueba", "Elena Prueba")
-    assert dict(candidatos)["Andrés Prueba"] == 99
+    andres = tarjeta(pagina(sesion, backend), "Andrés Prueba")
+    aviso = andres.split("data-perfil-actualizado")[1].split("</p>")[0]
+
+    assert "Actualizó su perfil después de postularse" in aviso
+    assert "hoy su ajuste sería <b>99 %</b>" in aviso
+    pct_al_postular = int(re.search(r'data-pct="(\d+)"', andres).group(1))
+    assert f'<span class="sube">(+{99 - pct_al_postular})</span>' in aviso
+    # El aviso está en el primer nivel; el detalle, en el segundo.
+    assert andres.index("data-perfil-actualizado") < andres.index('data-nivel="2"')
+
+
+def test_rf013_detalla_los_cambios_del_perfil_desde_la_postulacion(
+        sesion, backend, postulados):
+    aprendiz = postulados["aprendiz"].perfil          # se postuló con Python 2 y Scrum 2
+    perfiles.confirmar_perfil(
+        aprendiz, datos={"experiencia": "Un año como practicante.", "telefono": "3009998877"},
+        niveles={"Python": 4, "Django": 3, "Docker": 2})
+    andres = tarjeta(pagina(sesion, backend), "Andrés Prueba")
+    cambios = andres.split('data-cambios="si"')[1].split("Perfil con el que se postuló")[0]
+
+    assert "<b>Agregó:</b> Django (nivel 3), Docker (nivel 2)." in cambios
+    assert "<b>Cambió de nivel:</b> Python (2 → 4)." in cambios
+    assert "<b>Quitó:</b> Scrum." in cambios
+    assert "<b>Modificó:</b> teléfono, experiencia." in cambios
+    # Debajo sigue el perfil original, no el nuevo.
+    original = andres.split("Perfil con el que se postuló")[1]
+    assert "3001112233" in original and "3009998877" not in original
+    assert "Un año como practicante." not in original
+
+
+def test_rf013_sin_cambios_lo_dice(sesion, backend, postulados):
+    elena = tarjeta(pagina(sesion, backend), "Elena Prueba")
+    assert "data-perfil-actualizado" not in elena
+    assert 'data-cambios="no"' in elena
+    assert "Ninguno: el perfil sigue igual que el día de la postulación." in elena
+
+
+def test_rf013_la_postulacion_guarda_la_fotografia_del_perfil(backend, postulados):
+    foto = Postulacion.objects.get(candidato=postulados["aprendiz"].perfil).perfil_al_postular
+    assert foto["habilidades"] == {"Python": 2, "Scrum": 2}
+    assert foto["nombre_completo"] == "Andrés Prueba"
+    assert foto["version"] == 1
+    assert {"correo", "telefono", "experiencia", "educacion", "por_aprender"} <= set(foto)
+
+
+def test_rf013_postulacion_sin_fotografia_usa_el_perfil_actual(sesion, backend, postulados):
+    """Postulaciones creadas antes de que existiera la fotografía."""
+    Postulacion.objects.update(perfil_al_postular={})
+    html = pagina(sesion, backend)
+    assert [n for n, _ in orden(html)][:2] == ["Elena Prueba", "Ana María Ríos Bedoya"]
+    assert "data-perfil-actualizado" not in html
 
 
 def test_rf013_se_llega_desde_la_accion_de_mis_vacantes(sesion, backend, postulados):
@@ -150,11 +214,46 @@ def test_rf013_senala_claramente_las_obligatorias_que_faltan(sesion, backend, po
     assert "Docker" not in alerta
 
 
-def test_rf013_senala_las_obligatorias_que_tiene_por_debajo_del_nivel(
+def test_rf013_las_obligatorias_que_tiene_sin_el_nivel_van_en_naranja_no_en_rojo(
         sesion, backend, postulados):
     ana = tarjeta(pagina(sesion, backend), "Ana María Ríos Bedoya")
-    assert "Obligatorias por debajo del nivel exigido:" in ana
-    assert "<b>Django</b> (nivel 3 de 4)" in ana
+    rojo = ana.split("data-alerta-obligatorias")[1].split("</div>")[0]
+    naranja = ana.split("data-aviso-nivel")[1].split("</div>")[0]
+
+    assert 'class="alert alert-nivel" data-aviso-nivel' in ana
+    assert "Tiene estas obligatorias, pero por debajo del nivel exigido:" in naranja
+    assert "Django · nivel 3 de 4" in naranja
+    assert "Django" not in rojo                      # el rojo queda solo para lo que no tiene
+    assert "Neo4j / Cypher" not in naranja
+
+
+def test_rf013_el_naranja_es_mas_claro_cuanto_mas_cerca_esta_del_nivel(
+        sesion, backend, crear_candidato):
+    lejos_y_cerca = crear_candidato("niveles@correo.com", "Nicolás", {
+        "Python": 1, "Django": 3, "Neo4j / Cypher": 3, "Docker": 2})
+    services.postular(lejos_y_cerca, backend.pk)
+    nicolas = tarjeta(pagina(sesion, backend), "Nicolás Prueba")
+    naranja = nicolas.split("data-aviso-nivel")[1].split("</div>")[0]
+
+    # Django 3 de 4: le falta un nivel. Python 1 de 4: le faltan tres.
+    assert '<span class="tag tag-brecha brecha-1">Django · nivel 3 de 4</span>' in naranja
+    assert '<span class="tag tag-brecha brecha-3">Python · nivel 1 de 4</span>' in naranja
+    # Lo que alcanza el nivel sigue en verde.
+    assert '<span class="tag tag-ok">Neo4j / Cypher · peso 0.25 · nivel 3/3' in nicolas
+    assert "data-alerta-obligatorias" not in nicolas          # no le falta ninguna
+    assert 'data-cumple="no"' in nicolas                      # pero no pasa el filtro
+
+
+def test_rf013_la_escala_de_naranjas_va_de_claro_a_oscuro():
+    def fondo(clase):
+        css = (Path(settings.BASE_DIR) / "static" / "css" / "app.css").read_text("utf-8")
+        hexa = re.search(r"\.%s\{background:#([0-9A-F]{6})" % clase, css).group(1)
+        return sum(int(hexa[i:i + 2], 16) for i in (0, 2, 4))      # más alto = más claro
+    claridad = [fondo(f"brecha-{n}") for n in (1, 2, 3, 4)]
+    assert claridad == sorted(claridad, reverse=True)
+    assert clase_nivel({"nivel": 4, "nivel_min": 4}) == "tag-ok"
+    assert clase_nivel({"nivel": 3, "nivel_min": 4}) == "tag-brecha brecha-1"
+    assert clase_nivel({"nivel": 1, "nivel_min": 5}) == "tag-brecha brecha-4"
 
 
 def test_rf013_quien_cumple_todo_no_tiene_alerta(sesion, backend, postulados):
@@ -204,6 +303,23 @@ def test_rf013_el_perfil_completo_permite_descargar_la_hoja_de_vida_original(
     assert 'filename="mi_cv.docx"' in respuesta["Content-Disposition"]
 
 
+def test_rf013_la_hoja_de_vida_es_la_de_la_postulacion_aunque_suba_otra(
+        sesion, backend, crear_candidato):
+    usuario = crear_candidato("dos.cv@correo.com", "Daniela", {"Python": 4})
+    perfil = usuario.perfil
+    primera = perfiles.procesar_hoja_de_vida(perfil, SimpleUploadedFile(
+        "cv_inicial.docx", (CV / "cv_harvard.docx").read_bytes()))
+    perfiles.confirmar_perfil(perfil, hoja=primera)
+    postulacion, _ = services.postular(usuario, backend.pk)
+
+    segunda = perfiles.procesar_hoja_de_vida(perfil, SimpleUploadedFile(
+        "cv_nuevo.pdf", (CV / "cv_plano.pdf").read_bytes()))
+    perfiles.confirmar_perfil(perfil, hoja=segunda)
+
+    respuesta = sesion.get(reverse("postulaciones:hoja_de_vida", args=[postulacion.pk]))
+    assert 'filename="cv_inicial.docx"' in respuesta["Content-Disposition"]
+
+
 def test_rf013_sin_archivo_lo_indica_y_no_ofrece_descarga(sesion, backend, postulados):
     elena = tarjeta(pagina(sesion, backend), "Elena Prueba")
     assert "Llenó su perfil a mano; no subió archivo." in elena
@@ -234,17 +350,26 @@ def test_rf013_permite_filtrar_los_que_cumplen_todas_las_obligatorias(
 def test_rf013_tener_la_habilidad_sin_el_nivel_minimo_no_es_cumplir(backend, postulados):
     """Ana tiene Django, pero en nivel 3 y la vacante exige 4."""
     resultado = services.priorizadas(backend, solo_obligatorias=True)
-    nombres = [i["perfil"].nombre_completo for i in resultado["items"]]
+    nombres = [i["perfil"]["nombre_completo"] for i in resultado["items"]]
     assert "Ana María Ríos Bedoya" not in nombres
     assert (resultado["total"], resultado["cumplen"]) == (4, 1)
 
 
-def test_rf013_el_filtro_conserva_el_orden_por_match(sesion, backend, postulados):
-    perfiles.confirmar_perfil(postulados["ana"].perfil, niveles={
-        "Python": 4, "Django": 4, "Neo4j / Cypher": 3})
+def test_rf013_el_filtro_conserva_el_orden_por_match(
+        sesion, backend, postulados, crear_candidato):
+    justa = crear_candidato("justa@correo.com", "Julia", {
+        "Python": 4, "Django": 4, "Neo4j / Cypher": 3})      # cumple, sin Docker ni Scrum
+    services.postular(justa, backend.pk)
     candidatos = orden(pagina(sesion, backend, filtro="obligatorias"))
-    assert [n for n, _ in candidatos] == ["Elena Prueba", "Ana María Ríos Bedoya"]
+    assert [n for n, _ in candidatos] == ["Elena Prueba", "Julia Prueba"]
     assert candidatos[0][1] > candidatos[1][1]
+
+
+def test_rf013_mejorar_el_perfil_despues_no_cambia_el_filtro(sesion, backend, postulados):
+    """El filtro también usa el perfil de la postulación."""
+    perfiles.confirmar_perfil(postulados["ana"].perfil, niveles={
+        "Python": 5, "Django": 5, "Neo4j / Cypher": 5})
+    assert orden(pagina(sesion, backend, filtro="obligatorias")) == [("Elena Prueba", 99)]
 
 
 def test_rf013_filtro_sin_resultados_ofrece_ver_todos(sesion, backend, postulados):

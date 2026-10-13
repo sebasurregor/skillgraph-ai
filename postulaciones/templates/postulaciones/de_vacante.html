@@ -19,34 +19,46 @@
 </div>
 
 <div class="stack-16" id="postulantes" style="margin-top:18px">
-  {% for item in items %}{% with p=item.postulacion m=item.match perfil=item.perfil %}
+  {% for item in items %}{% with p=item.postulacion m=item.match perfil=item.perfil cambios=item.cambios %}
   <article class="job" data-postulacion="{{ p.pk }}" data-pct="{{ m.pct }}" data-cumple="{{ m.cumple_obligatorias|yesno:'si,no' }}">
     <div class="job-top">
       <span class="logo-sq">{{ forloop.counter }}</span>
       <div class="grow">
-        <h3>{{ perfil.nombre_completo|default:perfil.usuario.get_full_name }}</h3>
+        <h3>{{ perfil.nombre_completo }}</h3>
 
         {# Primer nivel: lo que decide. Coincidencias exactas con su peso y obligatorias faltantes. #}
         <div data-nivel="1">
           <p class="lbl" style="margin-top:10px">Habilidades que coinciden con la vacante</p>
           <div class="tags" data-lista="coincidencias">
             {% for c in m.cubiertas %}
-            <span class="tag {% if c.nivel >= c.nivel_min %}tag-ok{% else %}tag-aviso{% endif %}">{{ c.nombre }} · peso {{ c.peso|dos_decimales }} · nivel {{ c.nivel }}/{{ c.nivel_min }}{% if c.obligatoria %} · obligatoria{% endif %}</span>
+            <span class="tag {{ c|clase_nivel }}">{{ c.nombre }} · peso {{ c.peso|dos_decimales }} · nivel {{ c.nivel }}/{{ c.nivel_min }}{% if c.obligatoria %} · obligatoria{% endif %}</span>
             {% empty %}<span class="small muted">Ninguna habilidad coincide con las requeridas.</span>
             {% endfor %}
           </div>
 
-          {% if m.obligatorias_faltantes or m.obligatorias_bajo_nivel %}
+          {# Rojo: obligatorias que no tiene. #}
+          {% if m.obligatorias_faltantes %}
           <div class="alert alert-error" data-alerta-obligatorias style="margin-top:12px">
-            <span>
-              {% if m.obligatorias_faltantes %}Le faltan habilidades obligatorias:
-              {% for f in m.obligatorias_faltantes %}<b>{{ f.nombre }}</b> (peso {{ f.peso|dos_decimales }}){% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}
-              {% if m.obligatorias_bajo_nivel %}Obligatorias por debajo del nivel exigido:
-              {% for c in m.obligatorias_bajo_nivel %}<b>{{ c.nombre }}</b> (nivel {{ c.nivel }} de {{ c.nivel_min }}){% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}
-            </span>
+            <span>Le faltan habilidades obligatorias:
+              {% for f in m.obligatorias_faltantes %}<b>{{ f.nombre }}</b> (peso {{ f.peso|dos_decimales }}){% if not forloop.last %}, {% endif %}{% endfor %}.</span>
           </div>
-          {% else %}
+          {% endif %}
+          {# Naranja: obligatorias que sí tiene, pero sin alcanzar el nivel. Más claro cuanto más cerca. #}
+          {% if m.obligatorias_bajo_nivel %}
+          <div class="alert alert-nivel" data-aviso-nivel style="margin-top:12px">
+            <span>Tiene estas obligatorias, pero por debajo del nivel exigido:</span>
+            {% for c in m.obligatorias_bajo_nivel %}<span class="tag {{ c|clase_nivel }}">{{ c.nombre }} · nivel {{ c.nivel }} de {{ c.nivel_min }}</span>{% endfor %}
+          </div>
+          {% endif %}
+          {% if m.cumple_obligatorias %}
           <p class="small" data-cumple-todas style="margin-top:10px;color:#0A6B32;font-weight:600">Cumple todas las habilidades obligatorias.</p>
+          {% endif %}
+
+          {% if cambios.hay %}
+          <p class="small" data-perfil-actualizado style="margin-top:10px">
+            <span class="tag tag-neutro">Actualizó su perfil después de postularse</span>
+            hoy su ajuste sería <b>{{ cambios.pct_ahora }} %</b>{% if cambios.diferencia > 0 %} <span class="sube">(+{{ cambios.diferencia }})</span>{% elif cambios.diferencia < 0 %} <span class="baja">({{ cambios.diferencia }})</span>{% endif %}.
+          </p>
           {% endif %}
         </div>
       </div>
@@ -78,9 +90,23 @@
     <details class="porque" data-nivel="2">
       <summary class="btn btn-ghost">Ver perfil completo</summary>
       <div class="explain">
+        <div class="cambios" data-cambios="{{ cambios.hay|yesno:'si,no' }}">
+          <p class="lbl">Cambios en el perfil desde que se postuló</p>
+          {% if cambios.hay %}
+          <p class="small">Lo que ve en esta tarjeta es el perfil con el que se postuló ({{ cambios.pct_antes }} %).
+            Con su perfil de hoy el ajuste sería {{ cambios.pct_ahora }} %.</p>
+          {% if cambios.nuevas %}<p class="small" data-cambio="nuevas"><b>Agregó:</b> {% for h in cambios.nuevas %}{{ h.nombre }} (nivel {{ h.nivel }}){% if not forloop.last %}, {% endif %}{% endfor %}.</p>{% endif %}
+          {% if cambios.niveles %}<p class="small" data-cambio="niveles"><b>Cambió de nivel:</b> {% for h in cambios.niveles %}{{ h.nombre }} ({{ h.antes }} → {{ h.ahora }}){% if not forloop.last %}, {% endif %}{% endfor %}.</p>{% endif %}
+          {% if cambios.retiradas %}<p class="small" data-cambio="retiradas"><b>Quitó:</b> {{ cambios.retiradas|join:", " }}.</p>{% endif %}
+          {% if cambios.datos %}<p class="small" data-cambio="datos"><b>Modificó:</b> {{ cambios.datos|join:", " }}.</p>{% endif %}
+          {% else %}
+          <p class="small muted">Ninguno: el perfil sigue igual que el día de la postulación.</p>
+          {% endif %}
+        </div>
+        <p class="lbl">Perfil con el que se postuló{% if perfil.version %} · versión {{ perfil.version }}{% endif %}</p>
         <div class="grid-2">
           <div><p class="lbl">Datos personales</p>
-            <p class="small">{{ perfil.correo|default:perfil.usuario.email }} · {{ perfil.telefono|default:perfil.usuario.telefono }} · {{ perfil.usuario.ciudad }}</p></div>
+            <p class="small">{{ perfil.correo }} · {{ perfil.telefono }} · {{ perfil.ciudad }}</p></div>
           <div><p class="lbl">Hoja de vida original</p>
             {% if item.hoja_de_vida %}<a class="btn btn-ghost btn-sm" href="{% url 'postulaciones:hoja_de_vida' p.pk %}">Descargar {{ item.hoja_de_vida.nombre_original }}</a>
             {% else %}<p class="small muted">Llenó su perfil a mano; no subió archivo.</p>{% endif %}</div>
@@ -90,7 +116,7 @@
           <div><p class="lbl">Educación</p><p class="texto-largo">{{ perfil.educacion|default:"Sin estudios registrados." }}</p></div>
         </div>
         <p class="lbl" style="margin-top:14px">Todas sus habilidades</p>
-        <div class="tags">{% for h in perfil.habilidades.all %}<span class="tag tag-neutro">{{ h.habilidad.nombre }} · {{ h.nivel }}</span>{% endfor %}</div>
+        <div class="tags">{% for nombre, nivel in perfil.habilidades.items %}<span class="tag tag-neutro">{{ nombre }} · {{ nivel }}</span>{% endfor %}</div>
         <p class="lbl" style="margin-top:14px">Cómo se calculó el {{ m.pct }} %</p>
         {% include "matching/_explicacion.html" with match=m vacante=vacante sujeto="Candidato" para_reclutador=True %}
       </div>
