@@ -99,7 +99,7 @@ W_ADYACENCIA = float(os.getenv("W_ADYACENCIA", "0.05"))
 # ---- Cuentas y contraseñas (HU-RNF-001) -------------------------------------
 AUTH_USER_MODEL = "cuentas.Usuario"
 LOGIN_URL = "cuentas:ingresar"
-LOGIN_REDIRECT_URL = "cuentas:inicio"
+LOGIN_REDIRECT_URL = "raiz"
 
 # bcrypt con factor de costo 12 (2^12 iteraciones). Ver cuentas/hashers.py.
 PASSWORD_HASHERS = ["cuentas.hashers.BCryptCosto12PasswordHasher"]
@@ -140,6 +140,10 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
+
+# ---- Archivos subidos (hojas de vida). No se sirven públicamente. -------------
+MEDIA_ROOT = BASE_DIR / "media_uploads"
+CV_TAMANO_MAXIMO = 5 * 1024 * 1024
 
 # ---- Registro de eventos ----------------------------------------------------
 LOGGING = {

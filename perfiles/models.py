@@ -10,6 +10,11 @@ class PerfilCandidato(models.Model):
 
     usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                    related_name="perfil")
+    nombre_completo = models.CharField(max_length=150, blank=True)
+    correo = models.EmailField("correo de contacto", blank=True)
+    telefono = models.CharField("teléfono", max_length=10, blank=True)
+    experiencia = models.TextField(blank=True)
+    educacion = models.TextField("educación", blank=True)
     confirmado = models.BooleanField(
         default=False, help_text="El candidato ya confirmó los datos de su perfil.")
     por_aprender = models.ManyToManyField(
@@ -42,3 +47,62 @@ class HabilidadCandidato(models.Model):
 
     def __str__(self):
         return f"{self.perfil.usuario} · {self.habilidad} ({self.nivel})"
+
+
+class HojaDeVida(models.Model):
+    """Archivo original que subió el candidato y lo que el sistema extrajo de él."""
+
+    class Formato(models.TextChoices):
+        PDF = "pdf", "PDF"
+        DOCX = "docx", "Word (.docx)"
+
+    perfil = models.ForeignKey(PerfilCandidato, on_delete=models.CASCADE,
+                               related_name="hojas_de_vida")
+    archivo = models.FileField(upload_to="hojas_de_vida/%Y/%m/")
+    nombre_original = models.CharField(max_length=255)
+    formato = models.CharField(max_length=4, choices=Formato.choices)
+    tamano = models.PositiveIntegerField("tamaño en bytes")
+    texto = models.TextField(blank=True)
+    datos_extraidos = models.JSONField(default=dict)
+    suficiente = models.BooleanField(
+        default=False, help_text="Se logró extraer información suficiente para precargar.")
+    subida_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-subida_en"]
+        verbose_name = "hoja de vida"
+        verbose_name_plural = "hojas de vida"
+
+    def __str__(self):
+        return self.nombre_original
+
+    @property
+    def faltantes(self):
+        return self.datos_extraidos.get("faltantes", [])
+
+
+class VersionPerfil(models.Model):
+    """Fotografía del perfil cada vez que el candidato lo confirma. La última es la válida."""
+
+    class Origen(models.TextChoices):
+        HOJA_DE_VIDA = "cv", "Hoja de vida"
+        MANUAL = "manual", "Formulario manual"
+
+    perfil = models.ForeignKey(PerfilCandidato, on_delete=models.CASCADE,
+                               related_name="versiones")
+    numero = models.PositiveIntegerField()
+    origen = models.CharField(max_length=6, choices=Origen.choices)
+    hoja_de_vida = models.ForeignKey(HojaDeVida, null=True, blank=True,
+                                     on_delete=models.SET_NULL, related_name="versiones")
+    datos = models.JSONField()
+    confirmada_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-numero"]
+        constraints = [models.UniqueConstraint(fields=["perfil", "numero"],
+                                               name="version_unica_por_perfil")]
+        verbose_name = "versión del perfil"
+        verbose_name_plural = "versiones del perfil"
+
+    def __str__(self):
+        return f"{self.perfil} · versión {self.numero}"
