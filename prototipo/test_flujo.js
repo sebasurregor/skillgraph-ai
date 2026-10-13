@@ -18,6 +18,9 @@ const dom = new JSDOM(html, {
       clearRect(){}, beginPath(){}, moveTo(){}, lineTo(){}, stroke(){}, arc(){}, fill(){},
       set strokeStyle(v){}, set fillStyle(v){}, set lineWidth(v){}
     });
+    // jsdom tampoco implementa el desplazamiento: se simula con funciones vacías.
+    w.scrollTo = () => {};
+    w.Element.prototype.scrollIntoView = () => {};
   }
 });
 
