@@ -1,0 +1,70 @@
+{% extends "base_app.html" %}
+{% block titulo %}Preferencias laborales · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">Preferencias laborales</p>
+    <h1>¿Qué empleo está buscando?</h1>
+    <p>Marque todo lo que le sirva. Con esto filtramos sus recomendaciones; lo que deje sin marcar no filtra.
+      Puede cambiarlo cuando quiera.</p>
+  </div>
+  {% if primera_vez %}<a class="btn btn-quiet" href="{% url 'raiz' %}" id="omitir-preferencias">Omitir por ahora</a>{% endif %}
+</div>
+
+{% include "_alerta_form.html" with visible=form.mensaje_error %}
+
+<form method="post" novalidate data-validar style="margin-top:18px">
+  {% csrf_token %}
+  <div class="card">
+    <h3>{{ form.cargos.label }}</h3>
+    <p class="small muted">Puede elegir varios, de cualquier área.</p>
+    <div class="habs">
+      {% for opcion in form.cargos %}<label class="hab">{{ opcion.tag }} <span>{{ opcion.choice_label }}</span></label>{% endfor %}
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <h3>{{ form.ubicaciones.label }}</h3>
+      <div class="habs">
+        {% for opcion in form.ubicaciones %}<label class="hab">{{ opcion.tag }} <span>{{ opcion.choice_label }}</span></label>{% endfor %}
+      </div>
+    </div>
+    <div class="card">
+      <h3>{{ form.tipos_contrato.label }}</h3>
+      <div class="habs">
+        {% for opcion in form.tipos_contrato %}<label class="hab">{{ opcion.tag }} <span>{{ opcion.choice_label }}</span></label>{% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>Rango salarial esperado</h3>
+    <p class="small muted">En pesos, por mes. No se lo mostramos al reclutador.</p>
+    <div class="grid-2" style="margin-top:14px">
+      {% include "_campo.html" with campo=form.salario_min %}
+      {% include "_campo.html" with campo=form.salario_max %}
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>{{ form.por_aprender.label }}</h3>
+    <p class="small muted">Opcional. Nos ayuda a recomendarle vacantes que hoy no cubre del todo, pero que puede alcanzar.</p>
+    {% for titulo, items in form.grupos_por_aprender %}
+    <details class="grupo-habs">
+      <summary>{{ titulo }} <span class="tiny muted">({{ items|length }})</span></summary>
+      <div class="habs">
+        {% for item in items %}
+        <label class="hab"><input type="checkbox" name="por_aprender" value="{{ item.habilidad.pk }}"{% if item.marcada %} checked{% endif %}> <span>{{ item.habilidad.nombre }}</span></label>
+        {% endfor %}
+      </div>
+    </details>
+    {% endfor %}
+  </div>
+
+  <div class="row between center wrap" style="margin-top:26px;padding-top:22px;border-top:1px solid var(--line);gap:14px">
+    <a class="btn btn-ghost" href="{% url 'perfiles:mi_perfil' %}">← Volver a mi perfil</a>
+    <button class="btn btn-accent" type="submit">Guardar preferencias</button>
+  </div>
+</form>
+{% endblock %}

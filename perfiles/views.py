@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from cuentas.models import Usuario
 from cuentas.permisos import rol_requerido
 from perfiles import services
-from perfiles.forms import CargaCVForm, PerfilForm
+from perfiles.forms import CargaCVForm, PerfilForm, PreferenciasForm
 from perfiles.models import HojaDeVida
 
 solo_candidato = rol_requerido(Usuario.Rol.CANDIDATO)
@@ -51,6 +51,9 @@ def confirmar(request, pk=None):
                          "su perfil válido.")
             if not en_grafo:
                 messages.warning(request, AVISO_GRAFO, extra_tags="grafo")
+            # La primera vez, el siguiente paso es decir qué empleo busca.
+            if services.preferencias_de(perfil) is None:
+                return redirect("perfiles:preferencias")
             return redirect("raiz")
     else:
         form = PerfilForm(initial=services.datos_para_confirmar(perfil, hoja),
@@ -66,4 +69,30 @@ def mi_perfil(request):
         "perfil": perfil, "vigente": services.version_vigente(perfil),
         "versiones": perfil.versiones.select_related("hoja_de_vida"),
         "habilidades": perfil.habilidades.select_related("habilidad"),
+        "preferencias": services.preferencias_de(perfil),
+        "por_aprender": perfil.por_aprender.all(),
         "seccion": "perfil"})
+
+
+@solo_candidato
+def preferencias(request):
+    """Preferencias laborales (HU-RF-004): se pueden editar en cualquier momento."""
+    perfil = services.perfil_de(request.user)
+    actuales = services.preferencias_de(perfil)
+    opciones = services.opciones_de_preferencias(actuales)
+
+    if request.method == "POST":
+        form = PreferenciasForm(request.POST, opciones=opciones)
+        if form.is_valid():
+            datos = form.cleaned_data
+            services.guardar_preferencias(perfil, datos, por_aprender=datos["por_aprender"])
+            messages.success(request, "Preferencias guardadas. Las usaremos para filtrar "
+                                      "sus recomendaciones.")
+            return redirect("raiz")
+    else:
+        inicial = {"por_aprender": list(perfil.por_aprender.all())}
+        if actuales:
+            inicial.update({c: getattr(actuales, c) for c in services.CAMPOS_PREFERENCIAS})
+        form = PreferenciasForm(initial=inicial, opciones=opciones)
+    return render(request, "perfiles/preferencias.html", {
+        "form": form, "primera_vez": actuales is None, "seccion": "preferencias"})

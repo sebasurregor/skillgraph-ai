@@ -104,3 +104,45 @@ class PerfilForm(FormularioValidadoMixin, forms.Form):
     @property
     def habilidades_sin_extraer(self):
         return not self.is_bound and "habilidades" in self.sin_extraer
+
+
+class PreferenciasForm(FormularioValidadoMixin, forms.Form):
+    """Preferencias laborales (HU-RF-004). Todo es opcional; el rango debe ser coherente."""
+
+    cargos = forms.MultipleChoiceField(
+        label="Cargos que le interesan", required=False, widget=forms.CheckboxSelectMultiple)
+    ubicaciones = forms.MultipleChoiceField(
+        label="Dónde quiere trabajar", required=False, widget=forms.CheckboxSelectMultiple)
+    tipos_contrato = forms.MultipleChoiceField(
+        label="Tipos de contrato", required=False, widget=forms.CheckboxSelectMultiple)
+    salario_min = forms.IntegerField(
+        label="Salario mensual esperado: desde", required=False, min_value=0,
+        widget=forms.NumberInput(attrs={"placeholder": "1500000", "step": 50000, "min": 0}))
+    salario_max = forms.IntegerField(
+        label="Hasta", required=False, min_value=0,
+        widget=forms.NumberInput(attrs={"placeholder": "2500000", "step": 50000, "min": 0}))
+    por_aprender = forms.ModelMultipleChoiceField(
+        label="Habilidades que le gustaría aprender", required=False,
+        queryset=Habilidad.objects.all())
+
+    def __init__(self, *args, opciones, **kwargs):
+        super().__init__(*args, **kwargs)
+        for campo in ("cargos", "ubicaciones", "tipos_contrato"):
+            self.fields[campo].choices = [(o, o) for o in opciones[campo]]
+
+    def clean(self):
+        datos = super().clean()
+        minimo, maximo = datos.get("salario_min"), datos.get("salario_max")
+        if minimo and maximo and minimo > maximo:
+            self.add_error("salario_max",
+                           "El salario máximo no puede ser menor que el mínimo.")
+        return datos
+
+    def grupos_por_aprender(self):
+        """[(título, [{habilidad, marcada}])] para pintar la lista por áreas."""
+        if self.is_bound:
+            marcadas = {int(pk) for pk in self.data.getlist("por_aprender") if pk.isdigit()}
+        else:
+            marcadas = {h.pk for h in self.initial.get("por_aprender", [])}
+        return [(titulo, [{"habilidad": h, "marcada": h.pk in marcadas} for h in habilidades])
+                for titulo, habilidades in services.catalogo_agrupado()]

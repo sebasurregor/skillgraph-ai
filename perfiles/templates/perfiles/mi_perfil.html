@@ -1,4 +1,5 @@
 {% extends "base_app.html" %}
+{% load humanize %}
 {% block titulo %}Mi perfil · SkillGraph AI{% endblock %}
 {% block contenido %}
 <div class="view-head">
@@ -30,6 +31,25 @@
 <div class="grid-2" style="margin-top:16px">
   <div class="card"><h3>Experiencia</h3><p class="texto-largo" style="margin-top:8px">{{ perfil.experiencia|default:"Sin experiencia registrada." }}</p></div>
   <div class="card"><h3>Educación</h3><p class="texto-largo" style="margin-top:8px">{{ perfil.educacion|default:"Sin estudios registrados." }}</p></div>
+</div>
+
+<div class="card" style="margin-top:16px" id="resumen-preferencias">
+  <div class="row between center wrap">
+    <h3>Preferencias laborales</h3>
+    <a class="btn btn-ghost btn-sm" href="{% url 'perfiles:preferencias' %}">Editar preferencias</a>
+  </div>
+  {% if preferencias and not preferencias.vacias %}
+  <p class="small" style="margin-top:8px"><b>Cargos:</b> {{ preferencias.cargos|join:", "|default:"cualquiera" }}</p>
+  <p class="small"><b>Ubicaciones:</b> {{ preferencias.ubicaciones|join:", "|default:"cualquiera" }}</p>
+  <p class="small"><b>Tipos de contrato:</b> {{ preferencias.tipos_contrato|join:", "|default:"cualquiera" }}</p>
+  <p class="small"><b>Salario esperado:</b>
+    {% if preferencias.salario_min %}desde ${{ preferencias.salario_min|intcomma }}{% endif %}
+    {% if preferencias.salario_max %}hasta ${{ preferencias.salario_max|intcomma }}{% endif %}
+    {% if not preferencias.salario_min and not preferencias.salario_max %}sin definir{% endif %}</p>
+  {% else %}
+  <p class="small muted" style="margin-top:8px">Todavía no ha indicado qué empleo busca. Le mostramos todas las vacantes.</p>
+  {% endif %}
+  {% if por_aprender %}<p class="small"><b>Quiere aprender:</b> {{ por_aprender|join:", " }}</p>{% endif %}
 </div>
 
 <div class="card tabla-card" style="margin-top:16px">
