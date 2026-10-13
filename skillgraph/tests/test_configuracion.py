@@ -4,6 +4,7 @@ from unittest import mock
 from django.core.management import get_commands
 from neo4j.exceptions import ServiceUnavailable
 
+from conftest import VERIFY_REAL
 from GraphCore.neo4j_driver import Neo4jConnection
 
 
@@ -29,7 +30,7 @@ def test_base_graphcore_informa_si_neo4j_no_esta_disponible():
     driver = mock.Mock()
     driver.verify_connectivity.side_effect = ServiceUnavailable("sin conexión")
     with mock.patch.object(Neo4jConnection, "get_driver", return_value=driver):
-        disponible, mensaje = Neo4jConnection.verify()
+        disponible, mensaje = VERIFY_REAL()
     assert disponible is False
     assert "no disponible" in mensaje
 
