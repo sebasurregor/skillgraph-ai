@@ -1,0 +1,38 @@
+{% load matching_extras %}
+{# Explicación del match. Requiere `match`, `vacante` y `pesos`; `sujeto` es opcional. #}
+<div class="explain" data-explicacion="{{ vacante.pk }}">
+  {% for c in match.componentes %}
+  <div class="comp" data-componente="{{ c.clave }}">
+    <span class="cn">{{ c.nombre }}</span>
+    <span class="bar"><i class="{% if c.clave == 'centralidad' %}blue{% elif c.clave == 'adyacencia' %}navy{% endif %}" style="width:{{ c.valor|por_ciento }}%"></i></span>
+    <span class="cv">{{ c.valor|dos_decimales }} × {{ c.peso|por_ciento }} %</span>
+  </div>
+  {% endfor %}
+  <div class="comp" data-componente="final" style="border-top:1px solid var(--line);padding-top:10px;margin-top:10px">
+    <span class="cn" style="font-weight:700">Puntaje final</span><span class="bar" style="background:none"></span>
+    <span class="cv" style="color:var(--green);font-weight:700;font-size:13px">{{ match.pct }} %</span>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div data-lista="cubiertas">
+      <p class="lbl">Habilidades que cubre ({{ match.cubiertas|length }})</p>
+      {% for c in match.cubiertas %}
+      <p class="small fila-habilidad"><span class="tag tag-ok">{{ c.nombre }} ✓</span>
+        peso {{ c.peso|dos_decimales }} · su nivel {{ c.nivel }} de {{ c.nivel_min }} exigido{% if c.obligatoria %} · obligatoria{% endif %}</p>
+      {% empty %}<p class="small muted">Todavía no cubre ninguna de las habilidades requeridas.</p>
+      {% endfor %}
+    </div>
+    <div data-lista="faltantes">
+      <p class="lbl">Habilidades que le faltan ({{ match.faltantes|length }})</p>
+      {% for f in match.faltantes %}
+      <p class="small fila-habilidad"><span class="tag tag-miss">{{ f.nombre }} · falta</span>
+        peso {{ f.peso|dos_decimales }} · nivel mínimo {{ f.nivel_min }}{% if f.obligatoria %} · <b class="peligro">obligatoria</b>{% endif %}</p>
+      {% empty %}<p class="small muted">Ninguna: cubre todo lo que pide la vacante.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="mini-graph">{% subgrafo match vacante.sigla sujeto|default:"Usted" %}</div>
+  <div class="explain-box">{{ match.texto }}</div>
+  <p class="tiny muted" style="margin-top:10px">Versión del algoritmo {{ match.version }} · vacante #{{ vacante.pk }} · cálculo reproducible</p>
+</div>

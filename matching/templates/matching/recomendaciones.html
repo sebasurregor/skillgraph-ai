@@ -1,0 +1,77 @@
+{% extends "base_app.html" %}
+{% load humanize matching_extras %}
+{% block titulo %}Vacantes recomendadas · SkillGraph AI{% endblock %}
+{% block contenido %}
+<div class="view-head">
+  <div>
+    <p class="eyebrow">Buscar empleo</p>
+    <h1>Hola, {{ user.first_name }}</h1>
+    <p>{% if todas %}Estas son todas las vacantes publicadas, con su ajuste frente a su perfil.
+       {% else %}Estas vacantes coinciden con su perfil{% if preferencias and not preferencias.vacias %} y con sus preferencias laborales{% endif %}.{% endif %}
+       Abra «Ver por qué» para conocer el cálculo.</p>
+  </div>
+  <div class="row wrap">
+    <a class="btn btn-ghost" href="{% url 'perfiles:mi_perfil' %}">Ajustar mis habilidades</a>
+    <a class="btn btn-ghost" href="{% url 'perfiles:preferencias' %}">Mis preferencias</a>
+  </div>
+</div>
+
+{% if aviso %}<p class="tiny muted" data-aviso-grafo style="margin-bottom:12px">{{ aviso }}</p>{% endif %}
+
+<form method="get" class="row between center wrap" id="controles" style="gap:14px">
+  <div class="filters" style="margin-top:0">
+    <a class="chip" href="?orden={{ orden }}" aria-pressed="{% if todas %}false{% else %}true{% endif %}">Recomendadas para mí</a>
+    <a class="chip" href="?ver=todas&amp;orden={{ orden }}" aria-pressed="{% if todas %}true{% else %}false{% endif %}">Todas las vacantes ({{ total }})</a>
+  </div>
+  <div class="row center">
+    {% if todas %}<input type="hidden" name="ver" value="todas">{% endif %}
+    <label class="small muted" for="orden">Ordenar por</label>
+    <select class="select" id="orden" name="orden" style="width:auto" onchange="this.form.submit()">
+      {% for valor, nombre in ordenes %}<option value="{{ valor }}"{% if valor == orden %} selected{% endif %}>{{ nombre }}</option>{% endfor %}
+    </select>
+    <noscript><button class="btn btn-ghost btn-sm" type="submit">Ordenar</button></noscript>
+  </div>
+</form>
+
+<div class="row between center" style="margin-top:22px">
+  <h2 style="font-size:19px">{% if todas %}Todas las vacantes{% else %}Recomendadas para usted{% endif %} ({{ items|length }})</h2>
+  {% if not todas and ocultas %}<span class="small muted">{{ ocultas }} vacante{{ ocultas|pluralize }} no coincide{{ ocultas|pluralize:"n" }} con su perfil o sus preferencias.</span>{% endif %}
+</div>
+
+<div class="stack-16" id="vacantes" style="margin-top:16px">
+  {% for item in items %}{% with v=item.vacante m=item.match %}
+  <article class="job" data-vacante="{{ v.pk }}" data-pct="{{ m.pct }}">
+    <div class="job-top">
+      <span class="logo-sq">{{ v.sigla }}</span>
+      <div class="grow">
+        <h3>{{ v.titulo }}</h3>
+        <p class="meta">{{ v.empresa }} · {{ v.ciudad }} · {{ v.modalidad }} · {{ v.jornada }} · ${{ v.salario|intcomma }} · publicada hace {{ v.publicada_en|timesince }}</p>
+        <div class="tags">
+          {% for c in m.cubiertas %}<span class="tag tag-ok">{{ c.nombre }} ✓</span>{% endfor %}
+          {% for f in m.faltantes %}<span class="tag tag-miss">{{ f.nombre }} · falta</span>{% endfor %}
+        </div>
+      </div>
+      <div class="score">
+        <div class="ring">
+          <svg width="66" height="66" aria-hidden="true"><circle cx="33" cy="33" r="26" fill="none" stroke="var(--line)" stroke-width="7"/>
+            <circle cx="33" cy="33" r="26" fill="none" stroke="{{ m.pct|color_ajuste }}" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{ m.pct|trazo_anillo }} 163"/></svg>
+          <b style="color:{{ m.pct|color_ajuste }}">{{ m.pct }}%</b>
+        </div>
+        <span class="tiny muted">de ajuste</span>
+      </div>
+    </div>
+    <details class="porque">
+      <summary class="btn btn-ghost">Ver por qué {{ m.pct }} %</summary>
+      {% include "matching/_explicacion.html" with match=m vacante=v %}
+    </details>
+  </article>
+  {% endwith %}{% empty %}
+  <div class="empty">
+    <h3>{% if todas %}Todavía no hay vacantes publicadas{% else %}Ninguna vacante coincide con su perfil y sus preferencias{% endif %}</h3>
+    <p>{% if todas %}Vuelva pronto: los reclutadores publican vacantes nuevas todos los días.
+       {% else %}Puede ver todas las vacantes, agregar habilidades a su perfil o ampliar sus preferencias.{% endif %}</p>
+    {% if not todas %}<a class="btn btn-primary" href="?ver=todas">Ver todas las vacantes</a>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

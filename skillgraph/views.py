@@ -16,4 +16,4 @@ def portada(request):
         return redirect("vacantes:lista")
     if not perfiles.tiene_perfil_confirmado(usuario):
         return redirect("perfiles:cargar_cv")
-    return redirect("cuentas:inicio")
+    return redirect("recomendaciones:lista")

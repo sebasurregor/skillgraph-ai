@@ -43,3 +43,12 @@ input[type="checkbox"].is-invalid, input[type="radio"].is-invalid{outline:2px so
 .grupo-habs summary{cursor:pointer;font-weight:600;font-size:14px}
 .grupo-habs.is-invalid{outline:2px solid var(--danger);outline-offset:6px;border-radius:var(--r-sm)}
 .texto-largo{white-space:pre-line;font-size:14px;line-height:1.55}
+
+/* Recomendaciones y explicación del match (HU-RF-005) */
+a.chip{text-decoration:none;color:inherit}
+.porque{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.porque summary{list-style:none;display:inline-flex}
+.porque summary::-webkit-details-marker{display:none}
+.porque[open] summary{background:var(--sky-soft);border-color:var(--sky)}
+.fila-habilidad{margin-top:7px;line-height:1.9}
+.comp .cv{width:110px}
