@@ -1,0 +1,135 @@
+{
+  "_ayuda": "Diccionario editable para leer hojas de vida. No distingue mayúsculas ni tildes. 'campos' reconoce rótulos como 'Nombre completo: ...'; 'secciones' reconoce los títulos de cada bloque; 'niveles' traduce palabras a un nivel de 1 a 5; 'habilidades' agrega sinónimos de las habilidades del catálogo (el nombre del catálogo siempre se reconoce, no hace falta repetirlo).",
+
+  "campos": {
+    "nombre": ["nombre", "nombres", "name", "full name", "nombre completo", "nombres y apellidos", "nombre y apellidos", "apellidos y nombres"],
+    "correo": ["correo", "correo electrónico", "e-mail", "email", "mail", "correo personal"],
+    "telefono": ["teléfono", "telefono", "tel", "celular", "cel", "móvil", "movil", "phone", "mobile", "whatsapp", "contacto", "número de contacto", "teléfono móvil"]
+  },
+
+  "secciones": {
+    "experiencia": ["experiencia", "experiencia laboral", "experiencia profesional", "experiencia de trabajo", "trayectoria", "trayectoria laboral", "trayectoria profesional", "historia laboral", "historial laboral", "empleos anteriores", "trabajos anteriores", "work experience", "experience", "professional experience"],
+    "educacion": ["educación", "formación", "formación académica", "formación profesional", "estudios", "estudios realizados", "información académica", "preparación académica", "education", "academic background"],
+    "habilidades": ["habilidades", "habilidades técnicas", "habilidades y competencias", "habilidades y herramientas", "competencias", "aptitudes", "destrezas", "conocimientos", "fortalezas", "qué sé hacer", "lo que sé hacer", "skills", "technical skills"],
+    "otras": ["perfil", "perfil profesional", "perfil laboral", "resumen", "resumen profesional", "objetivo", "objetivo profesional", "sobre mí", "acerca de mí", "datos personales", "información personal", "información de contacto", "contacto", "referencias", "referencias personales", "referencias laborales", "referencias familiares", "idiomas", "cursos", "certificaciones", "logros", "reconocimientos", "intereses", "pasatiempos", "hoja de vida", "curriculum vitae", "currículum vitae", "cv", "summary", "profile", "references", "languages"]
+  },
+
+  "niveles": {
+    "básico": 2, "principiante": 2, "inicial": 2, "basic": 2,
+    "intermedio": 3, "medio": 3, "intermediate": 3,
+    "avanzado": 4, "alto": 4, "advanced": 4,
+    "experto": 5, "experta": 5, "dominio": 5, "expert": 5
+  },
+
+  "habilidades": {
+    "Atención al cliente": ["servicio al cliente", "atención al público", "atención de clientes", "customer service"],
+    "Trabajo en equipo": ["trabajo colaborativo", "teamwork"],
+    "Puntualidad": ["puntual", "cumplimiento de horarios"],
+    "Comunicación": ["comunicación asertiva", "buena comunicación"],
+    "Excel": ["microsoft excel", "hojas de cálculo"],
+    "Manejo de computador": ["ofimática", "office", "herramientas ofimáticas", "word y excel"],
+    "Resolución de problemas": ["solución de problemas"],
+    "Liderazgo": ["manejo de personal", "liderazgo de equipos"],
+
+    "Manejo de inventarios": ["control de inventarios", "inventario de bodega"],
+    "Picking y packing": ["picking", "packing"],
+    "Recepción de mercancía": ["recibo de mercancía", "recepción de mercancías"],
+    "Montacargas": ["operador de montacargas", "manejo de montacargas"],
+    "WMS / SAP": ["wms", "sap"],
+    "Alistamiento de pedidos": ["preparación de pedidos", "separación de pedidos"],
+    "Carga y descarga": ["cargue y descargue", "cargue y descargue de mercancía"],
+
+    "Cierre de ventas": ["ventas", "asesoría comercial", "venta directa"],
+    "Manejo de caja": ["cajero", "cajera", "cuadre de caja", "manejo de dinero"],
+    "Inventarios": ["surtido de góndolas"],
+    "Visual merchandising": ["exhibición de producto", "vitrinismo"],
+    "Ventas por WhatsApp": ["ventas por redes"],
+    "Facturación electrónica": ["facturación"],
+
+    "Atención telefónica": ["call center", "contact center", "atención por teléfono"],
+    "Manejo de CRM": ["crm", "salesforce"],
+    "Manejo de quejas": ["pqrs", "quejas y reclamos"],
+    "Digitación rápida": ["digitación"],
+    "Inglés conversacional": ["inglés", "ingles b1", "inglés b2", "bilingüe"],
+
+    "Manipulación de alimentos": ["curso de manipulación de alimentos", "bpm"],
+    "Servicio a la mesa": ["mesero", "mesera", "servicio de mesa"],
+    "Cocina caliente": ["línea caliente", "cocinero", "cocinera"],
+    "Barismo": ["barista"],
+    "Caja y facturación": ["caja registradora"],
+    "Panadería y repostería": ["panadería", "repostería", "pastelería"],
+    "Manejo de domicilios": ["despacho de domicilios"],
+
+    "Auxiliar de enfermería": ["técnico en enfermería", "técnica en enfermería"],
+    "Toma de signos vitales": ["signos vitales"],
+    "Cuidado de adulto mayor": ["cuidado de adultos mayores", "cuidadora", "cuidador"],
+    "Cuidado infantil": ["cuidado de niños", "niñera"],
+
+    "Planeación de clases": ["planeación pedagógica"],
+    "Manejo de grupo": ["manejo de grupos"],
+    "Plataformas virtuales": ["moodle", "classroom", "google classroom"],
+    "Primera infancia": ["educación inicial"],
+
+    "Contabilidad básica": ["contabilidad", "causación"],
+    "Nómina": ["liquidación de nómina"],
+    "Siigo / World Office": ["siigo", "world office"],
+    "Archivo y documentación": ["archivo", "gestión documental"],
+    "Cartera y cobranza": ["cartera", "cobranza", "cobro de cartera"],
+
+    "Electricidad": ["electricista", "instalaciones eléctricas"],
+    "Plomería": ["plomero", "fontanería"],
+    "Soldadura": ["soldador"],
+    "Trabajo en alturas": ["curso de alturas", "certificado de alturas", "alturas"],
+    "Lectura de planos": ["interpretación de planos"],
+    "Pintura y acabados": ["pintor", "estuco y pintura"],
+    "Obra blanca": ["drywall", "enchape"],
+
+    "Corte de cabello": ["corte de pelo", "barbería", "peluquería"],
+    "Colorimetría": ["tintes", "coloración"],
+    "Manicure y pedicure": ["manicure", "pedicure", "manicurista", "uñas"],
+    "Depilación": ["depilación con cera"],
+    "Tratamientos capilares": ["keratina", "alisados"],
+
+    "Conducción de moto": ["motociclista", "licencia a2"],
+    "Licencia B1": ["licencia de conducción b1", "pase b1"],
+    "Licencia C1": ["licencia de conducción c1", "pase c1"],
+    "Entrega de domicilios": ["domiciliario", "mensajero", "mensajería"],
+    "Mecánica básica": ["mecánica"],
+
+    "Curso de vigilancia": ["curso de vigilancia vigente", "fundamentación en vigilancia"],
+    "Control de acceso": ["control de ingreso", "control de accesos"],
+    "Manejo de CCTV": ["cctv", "monitoreo de cámaras", "circuito cerrado"],
+    "Reporte de novedades": ["minuta", "registro de novedades"],
+
+    "Aseo de áreas": ["aseo", "limpieza", "servicios generales", "aseo general"],
+    "Manejo de químicos": ["productos de limpieza"],
+    "Mantenimiento locativo": ["mantenimiento general", "todero"],
+    "Jardinería": ["jardinero"],
+
+    "Recepción de huéspedes": ["recepcionista", "check in"],
+    "Camarería": ["camarera", "camarero"],
+    "Guianza turística": ["guía turístico", "guía turística"],
+    "Manejo de eventos": ["logística de eventos", "eventos"],
+
+    "Redes sociales": ["instagram", "tiktok", "manejo de redes sociales"],
+    "Community management": ["community manager"],
+    "Diseño gráfico": ["photoshop", "illustrator", "canva"],
+    "Edición de video": ["premiere", "capcut"],
+
+    "Operación de maquinaria": ["operario de máquina", "operador de maquinaria"],
+    "Control de calidad": ["inspección de calidad"],
+    "Empaque y etiquetado": ["empaque", "etiquetado"],
+    "Manejo de cultivos": ["cosecha", "siembra"],
+    "Manejo de línea de producción": ["línea de producción", "operario de producción"],
+
+    "JavaScript": ["js", "node.js", "nodejs"],
+    "SQL": ["mysql", "postgresql", "sql server"],
+    "Neo4j / Cypher": ["neo4j", "cypher"],
+    "AWS": ["amazon web services"],
+    "Power BI": ["powerbi"],
+    "Soporte técnico": ["mesa de ayuda", "help desk"],
+    "Git": ["github", "gitlab"],
+    "Scrum": ["metodologías ágiles", "agile"],
+    "React": ["react.js", "reactjs"]
+  }
+}
