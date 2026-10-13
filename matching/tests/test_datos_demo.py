@@ -17,6 +17,7 @@ NO_TECNICAS = ["Logística y bodega", "Alimentos y restaurantes", "Belleza y est
 
 @pytest.fixture
 def demo(db):
+    """Aquí interesa además lo que el comando imprime."""
     salida = StringIO()
     call_command("cargar_datos_demo", stdout=salida)
     return salida.getvalue()
@@ -77,6 +78,7 @@ def test_demo_crea_a_camilo_con_perfil_de_temporada(demo):
         "Carga y descarga": 3, "Alistamiento de pedidos": 2}
 
 
+@pytest.mark.hash_real
 def test_demo_las_contrasenas_quedan_cifradas(demo):
     for usuario in Usuario.objects.all():
         assert usuario.password.startswith("bcrypt_sha256$$2b$12$")

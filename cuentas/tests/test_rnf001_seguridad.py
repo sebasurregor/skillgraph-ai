@@ -13,6 +13,8 @@ from skillgraph.seguridad import seguridad_transporte
 
 QUINCE_MINUTOS = 15 * 60
 
+pytestmark = pytest.mark.hash_real
+
 
 # ---- Criterio 1: contraseñas con bcrypt, factor de costo mínimo 12 ----------
 
