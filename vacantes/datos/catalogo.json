@@ -1,0 +1,209 @@
+{
+  "transversales": [
+    "Trabajo en equipo",
+    "Puntualidad",
+    "Comunicación",
+    "Atención al cliente",
+    "Excel",
+    "Manejo de computador",
+    "Resolución de problemas",
+    "Liderazgo"
+  ],
+  "areas": [
+    {
+      "nombre": "Tecnología e informática",
+      "habilidades": [
+        "Python",
+        "Java",
+        "JavaScript",
+        "React",
+        "SQL",
+        "Django",
+        "Docker",
+        "Git",
+        "Linux",
+        "Neo4j / Cypher",
+        "AWS",
+        "Pandas",
+        "Power BI",
+        "Soporte técnico",
+        "Redes",
+        "Ciberseguridad",
+        "Scrum"
+      ]
+    },
+    {
+      "nombre": "Ventas y comercio",
+      "habilidades": [
+        "Atención al cliente",
+        "Cierre de ventas",
+        "Manejo de caja",
+        "Inventarios",
+        "Visual merchandising",
+        "Ventas por WhatsApp",
+        "Facturación electrónica",
+        "Asesoría de producto"
+      ]
+    },
+    {
+      "nombre": "Servicio al cliente y call center",
+      "habilidades": [
+        "Atención telefónica",
+        "Manejo de CRM",
+        "Manejo de quejas",
+        "Retención de clientes",
+        "Digitación rápida",
+        "Inglés conversacional"
+      ]
+    },
+    {
+      "nombre": "Logística y bodega",
+      "habilidades": [
+        "Manejo de inventarios",
+        "Picking y packing",
+        "Recepción de mercancía",
+        "Montacargas",
+        "WMS / SAP",
+        "Alistamiento de pedidos",
+        "Carga y descarga"
+      ]
+    },
+    {
+      "nombre": "Alimentos y restaurantes",
+      "habilidades": [
+        "Manipulación de alimentos",
+        "Servicio a la mesa",
+        "Cocina caliente",
+        "Barismo",
+        "Caja y facturación",
+        "Panadería y repostería",
+        "Manejo de domicilios"
+      ]
+    },
+    {
+      "nombre": "Salud y cuidado",
+      "habilidades": [
+        "Auxiliar de enfermería",
+        "Toma de signos vitales",
+        "Primeros auxilios",
+        "Bioseguridad",
+        "Historia clínica",
+        "Cuidado de adulto mayor",
+        "Cuidado infantil"
+      ]
+    },
+    {
+      "nombre": "Educación",
+      "habilidades": [
+        "Planeación de clases",
+        "Manejo de grupo",
+        "Evaluación por competencias",
+        "Plataformas virtuales",
+        "Refuerzo escolar",
+        "Primera infancia"
+      ]
+    },
+    {
+      "nombre": "Administración y finanzas",
+      "habilidades": [
+        "Excel",
+        "Contabilidad básica",
+        "Facturación electrónica",
+        "Nómina",
+        "Siigo / World Office",
+        "Archivo y documentación",
+        "Atención a proveedores",
+        "Cartera y cobranza"
+      ]
+    },
+    {
+      "nombre": "Construcción y oficios",
+      "habilidades": [
+        "Electricidad",
+        "Plomería",
+        "Soldadura",
+        "Trabajo en alturas",
+        "Lectura de planos",
+        "Pintura y acabados",
+        "Manejo de herramienta",
+        "Obra blanca"
+      ]
+    },
+    {
+      "nombre": "Belleza y estética",
+      "habilidades": [
+        "Corte de cabello",
+        "Colorimetría",
+        "Manicure y pedicure",
+        "Maquillaje",
+        "Depilación",
+        "Tratamientos capilares"
+      ]
+    },
+    {
+      "nombre": "Transporte y conducción",
+      "habilidades": [
+        "Conducción de moto",
+        "Licencia B1",
+        "Licencia C1",
+        "Manejo de rutas",
+        "Entrega de domicilios",
+        "Mecánica básica"
+      ]
+    },
+    {
+      "nombre": "Seguridad y vigilancia",
+      "habilidades": [
+        "Curso de vigilancia",
+        "Control de acceso",
+        "Manejo de CCTV",
+        "Reporte de novedades",
+        "Primeros auxilios"
+      ]
+    },
+    {
+      "nombre": "Aseo y mantenimiento",
+      "habilidades": [
+        "Aseo de áreas",
+        "Manejo de químicos",
+        "Mantenimiento locativo",
+        "Jardinería",
+        "Lavandería"
+      ]
+    },
+    {
+      "nombre": "Turismo y hotelería",
+      "habilidades": [
+        "Recepción de huéspedes",
+        "Reservas",
+        "Camarería",
+        "Inglés conversacional",
+        "Guianza turística",
+        "Manejo de eventos"
+      ]
+    },
+    {
+      "nombre": "Marketing y diseño",
+      "habilidades": [
+        "Redes sociales",
+        "Creación de contenido",
+        "Diseño gráfico",
+        "Community management",
+        "Fotografía",
+        "Figma",
+        "Edición de video"
+      ]
+    },
+    {
+      "nombre": "Agro y producción",
+      "habilidades": [
+        "Operación de maquinaria",
+        "Control de calidad",
+        "Empaque y etiquetado",
+        "Buenas prácticas agrícolas",
+        "Manejo de cultivos",
+        "Manejo de línea de producción"
+      ]
+    }
+  ]
+}

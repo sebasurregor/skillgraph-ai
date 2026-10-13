@@ -32,9 +32,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "rest_framework",
     "GraphCore",
     "cuentas",
+    "vacantes",
+    "perfiles",
+    "matching",
 ]
 
 MIDDLEWARE = [
@@ -113,6 +117,14 @@ SESSION_COOKIE_SAMESITE = "Lax"
 
 # ---- Transporte: HTTPS obligatorio cuando DEBUG=False -----------------------
 globals().update(seguridad_transporte(DEBUG))
+
+# ---- Servicios JSON (Django REST Framework) ---------------------------------
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
+}
 
 # ---- Internacionalización ---------------------------------------------------
 LANGUAGE_CODE = "es-co"

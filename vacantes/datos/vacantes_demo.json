@@ -1,0 +1,694 @@
+[
+  {
+    "titulo": "Auxiliar de bodega — temporada navideña",
+    "empresa": "Logística Express S.A.S.",
+    "cargo": "Auxiliar logístico",
+    "area": "Logística y bodega",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Temporal",
+    "salario": 1600000,
+    "dias_publicada": 1,
+    "centralidad": 0.74,
+    "requisitos": [
+      {
+        "habilidad": "Manejo de inventarios",
+        "peso": 0.28,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Picking y packing",
+        "peso": 0.25,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Trabajo en equipo",
+        "peso": 0.2,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Recepción de mercancía",
+        "peso": 0.17,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Puntualidad",
+        "peso": 0.1,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Asesor comercial de tienda",
+    "empresa": "Moda Andina",
+    "cargo": "Asesor comercial",
+    "area": "Ventas y comercio",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Tiempo completo",
+    "salario": 1900000,
+    "dias_publicada": 3,
+    "centralidad": 0.86,
+    "requisitos": [
+      {
+        "habilidad": "Atención al cliente",
+        "peso": 0.3,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Cierre de ventas",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Manejo de caja",
+        "peso": 0.2,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Inventarios",
+        "peso": 0.15,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Comunicación",
+        "peso": 0.1,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Mesero para fines de semana",
+    "empresa": "Restaurante La Provincia",
+    "cargo": "Mesero",
+    "area": "Alimentos y restaurantes",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Por turnos",
+    "salario": 1500000,
+    "dias_publicada": 2,
+    "centralidad": 0.69,
+    "requisitos": [
+      {
+        "habilidad": "Servicio a la mesa",
+        "peso": 0.3,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Manipulación de alimentos",
+        "peso": 0.25,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Atención al cliente",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Caja y facturación",
+        "peso": 0.12,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Trabajo en equipo",
+        "peso": 0.08,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Agente de call center bilingüe",
+    "empresa": "ConectaBPO",
+    "cargo": "Agente de servicio",
+    "area": "Servicio al cliente y call center",
+    "ciudad": "Bogotá",
+    "modalidad": "Híbrido",
+    "jornada": "Tiempo completo",
+    "salario": 2600000,
+    "dias_publicada": 4,
+    "centralidad": 0.81,
+    "requisitos": [
+      {
+        "habilidad": "Inglés conversacional",
+        "peso": 0.32,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Atención telefónica",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Manejo de CRM",
+        "peso": 0.18,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Manejo de quejas",
+        "peso": 0.15,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Digitación rápida",
+        "peso": 0.1,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Auxiliar de enfermería",
+    "empresa": "Clínica San Rafael",
+    "cargo": "Auxiliar de enfermería",
+    "area": "Salud y cuidado",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Por turnos",
+    "salario": 2300000,
+    "dias_publicada": 5,
+    "centralidad": 0.77,
+    "requisitos": [
+      {
+        "habilidad": "Auxiliar de enfermería",
+        "peso": 0.3,
+        "nivel_minimo": 4,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Toma de signos vitales",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Bioseguridad",
+        "peso": 0.2,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Primeros auxilios",
+        "peso": 0.15,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Historia clínica",
+        "peso": 0.1,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Auxiliar contable",
+    "empresa": "Grupo Sartor",
+    "cargo": "Auxiliar contable",
+    "area": "Administración y finanzas",
+    "ciudad": "Bogotá",
+    "modalidad": "Híbrido",
+    "jornada": "Tiempo completo",
+    "salario": 2700000,
+    "dias_publicada": 6,
+    "centralidad": 0.83,
+    "requisitos": [
+      {
+        "habilidad": "Contabilidad básica",
+        "peso": 0.3,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Excel",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Facturación electrónica",
+        "peso": 0.2,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Siigo / World Office",
+        "peso": 0.15,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Archivo y documentación",
+        "peso": 0.1,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Docente de primaria",
+    "empresa": "Colegio La Alborada",
+    "cargo": "Docente",
+    "area": "Educación",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Tiempo completo",
+    "salario": 2900000,
+    "dias_publicada": 8,
+    "centralidad": 0.7,
+    "requisitos": [
+      {
+        "habilidad": "Planeación de clases",
+        "peso": 0.3,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Manejo de grupo",
+        "peso": 0.28,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Evaluación por competencias",
+        "peso": 0.2,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Plataformas virtuales",
+        "peso": 0.12,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Comunicación",
+        "peso": 0.1,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Domiciliario en moto",
+    "empresa": "RápidoYa",
+    "cargo": "Domiciliario",
+    "area": "Transporte y conducción",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Por horas",
+    "salario": 1700000,
+    "dias_publicada": 1,
+    "centralidad": 0.64,
+    "requisitos": [
+      {
+        "habilidad": "Conducción de moto",
+        "peso": 0.35,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Entrega de domicilios",
+        "peso": 0.25,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Manejo de rutas",
+        "peso": 0.2,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Puntualidad",
+        "peso": 0.2,
+        "nivel_minimo": 4,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Estilista profesional",
+    "empresa": "Studio Bruna",
+    "cargo": "Estilista",
+    "area": "Belleza y estética",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Tiempo completo",
+    "salario": 2000000,
+    "dias_publicada": 9,
+    "centralidad": 0.58,
+    "requisitos": [
+      {
+        "habilidad": "Corte de cabello",
+        "peso": 0.32,
+        "nivel_minimo": 4,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Colorimetría",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Atención al cliente",
+        "peso": 0.2,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Manicure y pedicure",
+        "peso": 0.13,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Maquillaje",
+        "peso": 0.1,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Guarda de seguridad",
+    "empresa": "Vigilancia Antioquia",
+    "cargo": "Guarda de seguridad",
+    "area": "Seguridad y vigilancia",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Por turnos",
+    "salario": 1800000,
+    "dias_publicada": 7,
+    "centralidad": 0.66,
+    "requisitos": [
+      {
+        "habilidad": "Curso de vigilancia",
+        "peso": 0.35,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Control de acceso",
+        "peso": 0.25,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Manejo de CCTV",
+        "peso": 0.2,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Reporte de novedades",
+        "peso": 0.12,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Puntualidad",
+        "peso": 0.08,
+        "nivel_minimo": 4,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Recepcionista de hotel",
+    "empresa": "Hotel Poblado Real",
+    "cargo": "Recepcionista",
+    "area": "Turismo y hotelería",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Por turnos",
+    "salario": 2100000,
+    "dias_publicada": 4,
+    "centralidad": 0.72,
+    "requisitos": [
+      {
+        "habilidad": "Recepción de huéspedes",
+        "peso": 0.28,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Reservas",
+        "peso": 0.24,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Inglés conversacional",
+        "peso": 0.23,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Atención al cliente",
+        "peso": 0.15,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Excel",
+        "peso": 0.1,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Community manager",
+    "empresa": "Estudio Cardinal",
+    "cargo": "Community manager",
+    "area": "Marketing y diseño",
+    "ciudad": "Remoto",
+    "modalidad": "Remoto",
+    "jornada": "Medio tiempo",
+    "salario": 2400000,
+    "dias_publicada": 2,
+    "centralidad": 0.75,
+    "requisitos": [
+      {
+        "habilidad": "Redes sociales",
+        "peso": 0.3,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Creación de contenido",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Diseño gráfico",
+        "peso": 0.2,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Fotografía",
+        "peso": 0.15,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Community management",
+        "peso": 0.1,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Electricista de obra",
+    "empresa": "Construcciones Vélez",
+    "cargo": "Oficial eléctrico",
+    "area": "Construcción y oficios",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Tiempo completo",
+    "salario": 3100000,
+    "dias_publicada": 6,
+    "centralidad": 0.68,
+    "requisitos": [
+      {
+        "habilidad": "Electricidad",
+        "peso": 0.32,
+        "nivel_minimo": 4,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Trabajo en alturas",
+        "peso": 0.26,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Lectura de planos",
+        "peso": 0.2,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Manejo de herramienta",
+        "peso": 0.12,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Trabajo en equipo",
+        "peso": 0.1,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Auxiliar de aseo y mantenimiento",
+    "empresa": "Servicios Integrales",
+    "cargo": "Auxiliar de servicios generales",
+    "area": "Aseo y mantenimiento",
+    "ciudad": "Medellín",
+    "modalidad": "Presencial",
+    "jornada": "Medio tiempo",
+    "salario": 1450000,
+    "dias_publicada": 3,
+    "centralidad": 0.55,
+    "requisitos": [
+      {
+        "habilidad": "Aseo de áreas",
+        "peso": 0.35,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Manejo de químicos",
+        "peso": 0.25,
+        "nivel_minimo": 2,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Mantenimiento locativo",
+        "peso": 0.2,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Puntualidad",
+        "peso": 0.2,
+        "nivel_minimo": 4,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Desarrollador Backend Senior",
+    "empresa": "TechNova S.A.S.",
+    "cargo": "Backend Engineer",
+    "area": "Tecnología e informática",
+    "ciudad": "Medellín",
+    "modalidad": "Híbrido",
+    "jornada": "Tiempo completo",
+    "salario": 9500000,
+    "dias_publicada": 3,
+    "centralidad": 0.91,
+    "requisitos": [
+      {
+        "habilidad": "Python",
+        "peso": 0.3,
+        "nivel_minimo": 4,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Django",
+        "peso": 0.25,
+        "nivel_minimo": 4,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Neo4j / Cypher",
+        "peso": 0.25,
+        "nivel_minimo": 3,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "Docker",
+        "peso": 0.12,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Scrum",
+        "peso": 0.08,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      }
+    ]
+  },
+  {
+    "titulo": "Ingeniera de datos",
+    "empresa": "Andes Analytics",
+    "cargo": "Data Engineer",
+    "area": "Tecnología e informática",
+    "ciudad": "Bogotá",
+    "modalidad": "Remoto",
+    "jornada": "Tiempo completo",
+    "salario": 8800000,
+    "dias_publicada": 1,
+    "centralidad": 0.84,
+    "requisitos": [
+      {
+        "habilidad": "Python",
+        "peso": 0.28,
+        "nivel_minimo": 4,
+        "obligatoria": true
+      },
+      {
+        "habilidad": "SQL",
+        "peso": 0.24,
+        "nivel_minimo": 4,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Pandas",
+        "peso": 0.2,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "AWS",
+        "peso": 0.16,
+        "nivel_minimo": 3,
+        "obligatoria": false
+      },
+      {
+        "habilidad": "Docker",
+        "peso": 0.12,
+        "nivel_minimo": 2,
+        "obligatoria": false
+      }
+    ]
+  }
+]
