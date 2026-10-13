@@ -94,8 +94,9 @@ def test_base_registro_rechaza_correo_ya_registrado(client, candidato):
 def test_base_inicio_de_sesion_con_credenciales_validas(client, candidato):
     _con_correo(client, candidato.email)
     respuesta = client.post(reverse("cuentas:ingresar_clave"), {"clave": CLAVE}, follow=True)
-    assert respuesta.redirect_chain[-1][0] == reverse("cuentas:inicio")
-    assert "Hola, Camilo" in respuesta.content.decode()
+    # Flujo resume-first: al candidato sin perfil se le ofrece primero subir su hoja de vida.
+    assert respuesta.redirect_chain[-1][0] == reverse("perfiles:cargar_cv")
+    assert "_auth_user_id" in client.session
 
 
 def test_base_inicio_de_sesion_rechaza_contrasena_incorrecta(client, candidato):

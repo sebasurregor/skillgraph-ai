@@ -21,6 +21,12 @@ def _transporte_local(settings):
     settings.CSRF_COOKIE_SECURE = False
 
 
+@pytest.fixture(autouse=True)
+def _archivos_temporales(settings, tmp_path):
+    """Las hojas de vida que suben las pruebas no se mezclan con las reales."""
+    settings.MEDIA_ROOT = tmp_path / "media"
+
+
 @pytest.fixture
 def crear_usuario(db):
     def _crear(correo="camilo.zapata@correo.com", rol=Usuario.Rol.CANDIDATO, **extra):
