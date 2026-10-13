@@ -142,8 +142,14 @@ class Match:
         return [f for f in self.faltantes if f["obligatoria"]]
 
     @property
+    def obligatorias_bajo_nivel(self):
+        """Obligatorias que el candidato tiene, pero por debajo del nivel mínimo."""
+        return [c for c in self.cubiertas if c["obligatoria"] and c["nivel"] < c["nivel_min"]]
+
+    @property
     def cumple_obligatorias(self):
-        return not self.obligatorias_faltantes
+        """Tiene todas las obligatorias con el nivel mínimo (igual que la previsualización)."""
+        return not self.obligatorias_faltantes and not self.obligatorias_bajo_nivel
 
     @property
     def componentes(self):

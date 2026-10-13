@@ -33,6 +33,6 @@
   </div>
 
   <div class="mini-graph">{% subgrafo match vacante.sigla sujeto|default:"Usted" %}</div>
-  <div class="explain-box">{{ match.texto }}</div>
+  {% if not para_reclutador %}<div class="explain-box">{{ match.texto }}</div>{% endif %}
   <p class="tiny muted" style="margin-top:10px">Versión del algoritmo {{ match.version }} · vacante #{{ vacante.pk }} · cálculo reproducible</p>
 </div>
