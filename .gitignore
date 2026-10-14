@@ -24,3 +24,8 @@ package-lock.json
 .coverage
 htmlcov/
 .pytest_cache/
+docs/diagramas/
+docs/arbol_directorios.txt
+docs/arquitectura.md
+docs/capturas_sugeridas.md
+docs/estado_sprint2.md
