@@ -68,6 +68,28 @@ en el log.
   construcción, comercio) que para cargos técnicos. Usar el catálogo de 16 áreas del prototipo y nunca
   asumir que el usuario es del sector tecnológico.
 
+## Comandos
+
+Con el entorno virtual activo (`venv\Scripts\activate`):
+
+```
+python manage.py migrate
+python manage.py check_graph          # verifica la conexión con Neo4j
+python manage.py init_graph           # restricciones e índices del grafo
+python manage.py cargar_datos_demo    # catálogo, 16 vacantes, reclutador, Ana y Camilo
+python manage.py sincronizar_grafo    # reconstruye Neo4j desde SQLite
+python manage.py runserver
+pytest
+flake8
+node prototipo/test_flujo.js
+```
+
+Las pruebas usan un Neo4j simulado (`conftest.py`, fixture `grafo`). Las de integración con el
+Neo4j real son opcionales: `SKILLGRAPH_PRUEBAS_NEO4J=1`.
+
+Documentación en `docs/`: `arquitectura.md`, `estado_sprint2.md`, `diagramas/*.puml`. Si cambia un
+modelo, un servicio o una ruta, actualice el diagrama y el documento que lo describen.
+
 ## Forma de trabajar
 
 - Una rama por historia (`feature/HU-RF-003`), commits pequeños con la clave de Jira (`SA-12: ...`).
