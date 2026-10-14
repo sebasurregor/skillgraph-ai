@@ -1,5 +1,7 @@
 # SkillGraph AI — Matching explicable de vacantes y competencias
 
+Equipo de trabajo: Sebastian Urrego Ramirez, Juan Manuel Agudelo Salazar, Juan Pablo López Lidueña
+
 Proyecto final de Sistemas de Información · Periodo 2026-2
 
 Plataforma de recomendación de empleo **para cualquier sector del mercado laboral**: calcula el
